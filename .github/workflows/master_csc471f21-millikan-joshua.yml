@@ -39,6 +39,8 @@ jobs:
         working-directory: ./js/
       - run: npx webpack -jsx
         working-directory: ./js/
+      - run: rm -rf ./js/node_modules
+        if: always()
       - name: Upload artifact for deployment job
         if: always()
         uses: actions/upload-artifact@v2
