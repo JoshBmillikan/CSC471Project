@@ -39,6 +39,7 @@ jobs:
         working-directory: ./js/
       - run: npx webpack -jsx
         working-directory: ./js/
+        if: succeeded() || failed()
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
