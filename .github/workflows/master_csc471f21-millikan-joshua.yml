@@ -37,6 +37,20 @@ jobs:
           name: php-app
           path: .
 
+      - uses: actions/checkout@v2
+      - uses: borales/actions-yarn@v2.3.0
+        with:
+          cmd: install # will run `yarn install` command
+          path: ./js/
+      - uses: borales/actions-yarn@v2.3.0
+        with:
+          cmd: build # will run `yarn build` command
+          path: ./js/
+      - uses: borales/actions-yarn@v2.3.0
+        with:
+          cmd: test # will run `yarn test` command
+          path: ./js/
+
   deploy:
     runs-on: ubuntu-latest
     needs: build
