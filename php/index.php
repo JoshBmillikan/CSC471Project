@@ -2,6 +2,6 @@
 ?>
 <!doctype html>
 <html lang="en">
-    <script type=”text/javascript” src=”../js/src/index.js” >
+    <script type=”text/javascript” src=”../js/build/index.bundle.js” >
     </script>
 </html>
