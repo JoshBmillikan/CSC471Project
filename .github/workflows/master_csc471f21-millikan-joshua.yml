@@ -31,25 +31,24 @@ jobs:
         if: steps.check_files.outputs.files_exists == 'true'
         run: composer validate --no-check-publish && composer install --prefer-dist --no-progress
 
+      - uses: actions/checkout@v2
+      - uses: borales/actions-yarn@v2.3.0
+        with:
+          cmd: install # will run `yarn install` command
+          entryPoint: ./js/
+      - uses: borales/actions-yarn@v2.3.0
+        with:
+          cmd: build # will run `yarn build` command
+          entryPoint: ./js/
+      - uses: borales/actions-yarn@v2.3.0
+        with:
+          cmd: test # will run `yarn test` command
+          entryPoint: ./js/
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
           name: php-app
           path: .
-
-      - uses: actions/checkout@v2
-      - uses: borales/actions-yarn@v2.3.0
-        with:
-          cmd: install # will run `yarn install` command
-          path: ./js/
-      - uses: borales/actions-yarn@v2.3.0
-        with:
-          cmd: build # will run `yarn build` command
-          path: ./js/
-      - uses: borales/actions-yarn@v2.3.0
-        with:
-          cmd: test # will run `yarn test` command
-          path: ./js/
 
   deploy:
     runs-on: ubuntu-latest
