@@ -38,8 +38,7 @@ jobs:
       - run: npm install
 
       - run: npm run webpack
-        with:
-          path: ./js/
+        working-directory: ${{env.working-directory}}/js/
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
