@@ -36,9 +36,9 @@ jobs:
         with:
           node-version: '14'
       - run: npm install
-        working-directory: ${{env.working-directory}}/js/
+        working-directory: ./js/
       - run: npm run webpack
-        working-directory: ${{env.working-directory}}/js/
+        working-directory: ./js/
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
