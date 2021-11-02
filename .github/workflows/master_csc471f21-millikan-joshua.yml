@@ -35,14 +35,13 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
-      - run: npx yarn install
+      - run: npm install
         working-directory: ./js/
-      - run: npx webpack -jsx
+      - run: npm run build
         working-directory: ./js/
-      - run: rm -rf ./js/node_modules
-        if: always()
+      - run: cp ./js/build ./site
+      - run: rm -rf ./js
       - name: Upload artifact for deployment job
-        if: always()
         uses: actions/upload-artifact@v2
         with:
           name: php-app
