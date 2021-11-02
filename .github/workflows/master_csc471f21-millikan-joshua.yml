@@ -39,7 +39,7 @@ jobs:
         working-directory: ./js/
       - run: npm run build
         working-directory: ./js/
-      - run: cp -r ./js/build ./site
+      - run: cp -r ./js/build .
       - run: rm -rf ./js
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
