@@ -19,6 +19,14 @@ if ($uri[1] !== 'api') {
 $dbh = get_db();
 
 $requestMethod = $_SERVER["REQUEST_METHOD"];
+
+function respond($response) {
+    header($response['status_code_header']);
+    if ($response['body']) {
+        echo $response['body'];
+    }
+}
+
 switch ($requestMethod) {
     case 'GET':
         if (uri[2] === 'tables') {
@@ -30,7 +38,7 @@ switch ($requestMethod) {
             $result = $statement->execute();
             $response['status_code_header'] = 'HTTP/1.1 200 OK';
             $response['body'] = json_encode($result);
-            echo $response;
+            respond($response);
         }
 
 }
