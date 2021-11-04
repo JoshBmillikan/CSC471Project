@@ -37,7 +37,7 @@ jobs:
           node-version: '14'
       - run: npm install
         working-directory: ./js/
-      - run: npm run build
+      - run: CI=false npm run build
         working-directory: ./js/
       - run: cp -R ./js/build/. .
       - run: rm -rf ./js
