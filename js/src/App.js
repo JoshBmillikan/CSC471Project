@@ -1,25 +1,42 @@
 import logo from './logo.svg';
 import './App.css';
+import Select from 'react-select';
+import {useEffect} from "react";
+import AsyncSelect from 'react-select/async';
+import {waitForElementToBeRemoved} from "@testing-library/react";
+
+const options = [
+    {value: 'patient', label: 'Patients'},
+    {value: 'vaccine', label: 'Vaccines'},
+    {value: 'allergy', label: 'Allergies'},
+];
+
+const url = "https://csc471f21-millikan-joshua.azurewebsites.net/php/API";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const loadOptions = (input) => {
+        return fetch(url + "/api/tables").then(
+            (response) => {
+                if (response.status === 200) {
+                    return response.json()
+                }
+            }
+        )
+    }
+    return (
+        <div className="App">
+            <header className="App-header">
+            </header>
+            <body>
+            <AsyncSelect
+                cacheOptions
+                defaultOptions
+                loadOptions={loadOptions}
+            >
+            </AsyncSelect>
+            </body>
+        </div>
+    );
 }
 
 export default App;

@@ -11,3 +11,26 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = explode( '/', $uri );
 
+if ($uri[1] !== 'api') {
+    header("HTTP/1.1 404 Not Found");
+    exit();
+}
+
+$dbh = get_db();
+
+$requestMethod = $_SERVER["REQUEST_METHOD"];
+switch ($requestMethod) {
+    case 'GET':
+        if (uri[2] === 'tables') {
+            $statement = $dbh->prepare("
+            SELECT TABLE_NAME 
+            FROM INFORMATION_SCHEMA.TABLES
+            WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='dbName' 
+            ");
+            $result = $statement->execute();
+            $response['status_code_header'] = 'HTTP/1.1 200 OK';
+            $response['body'] = json_encode($result);
+            echo $response;
+        }
+
+}
