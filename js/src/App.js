@@ -1,7 +1,5 @@
-import logo from './logo.svg';
 import './App.css';
 import Select from 'react-select';
-import {useEffect} from "react";
 import AsyncSelect from 'react-select/async';
 import {waitForElementToBeRemoved} from "@testing-library/react";
 
