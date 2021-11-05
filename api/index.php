@@ -27,7 +27,7 @@ function respond($response) {
     }
 }
 
-switch ($requestMethod) {
+switch (strtoupper($requestMethod)) {
     case 'GET':
         if ($uri[2] === 'tables') {
             $statement = $dbh->prepare("
@@ -36,10 +36,8 @@ switch ($requestMethod) {
             WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='vaccines' 
             ");
             $result = $statement->execute();
-            echo $result;
-//            $response['status_code_header'] = 'HTTP/1.1 200 OK';
-//            $response['body'] = json_encode($result);
-//            respond($response);
+            $response['status_code_header'] = 'HTTP/1.1 200 OK';
+            $response['body'] = json_encode($result);
+            respond($response);
         }
-
 }
