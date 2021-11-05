@@ -33,7 +33,7 @@ switch ($requestMethod) {
             $statement = $dbh->prepare("
             SELECT TABLE_NAME 
             FROM INFORMATION_SCHEMA.TABLES
-            WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='dbName' 
+            WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='vaccines' 
             ");
             $result = $statement->execute();
             $response['status_code_header'] = 'HTTP/1.1 200 OK';
