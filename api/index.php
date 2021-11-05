@@ -35,7 +35,7 @@ switch (strtoupper($requestMethod)) {
             FROM INFORMATION_SCHEMA.TABLES
             WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='vaccines' 
             ");
-            $result = $statement->execute();
+            $result = $statement->fetchAll();
             $response['status_code_header'] = 'HTTP/1.1 200 OK';
             $response['body'] = json_encode($result);
             respond($response);
