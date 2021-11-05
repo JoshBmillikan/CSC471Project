@@ -27,9 +27,9 @@ function respond($response) {
     }
 }
 
-switch (strtoupper($requestMethod)) {
-    case 'GET':
-        if ($uri[3] === 'tables') {
+function get($uri, $dbh) {
+    switch ($uri[3]) {
+        case 'tables':
             $statement = $dbh->prepare("
             SELECT TABLE_NAME 
             FROM INFORMATION_SCHEMA.TABLES
@@ -41,7 +41,19 @@ switch (strtoupper($requestMethod)) {
                 $response['body'] = json_encode($result);
                 respond($response);
             } else {
-                header('"HTTP/1.1 502 Bad Gateway');
+                header('HTTP/1.1 502 Bad Gateway');
             }
-        }
+            break;
+        default: header('HTTP/1.1 404 Not Found');
+    }
+}
+
+switch (strtoupper($requestMethod)) {
+    case 'GET':
+        get($uri,$dbh);
+        break;
+    case 'POST':
+        //todo
+        break;
+    default: header('HTTP/1.1 400 Bad Request');
 }
