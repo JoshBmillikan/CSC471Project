@@ -29,7 +29,7 @@ function respond($response) {
 
 switch ($requestMethod) {
     case 'GET':
-        if (uri[2] === 'tables') {
+        if ($uri[2] === 'tables') {
             $statement = $dbh->prepare("
             SELECT TABLE_NAME 
             FROM INFORMATION_SCHEMA.TABLES
