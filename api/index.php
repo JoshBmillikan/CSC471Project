@@ -33,7 +33,7 @@ function get($uri, $dbh) {
             $statement = $dbh->prepare("
             SELECT TABLE_NAME 
             FROM INFORMATION_SCHEMA.TABLES
-            WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='vaccines' 
+            WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='vaccines'
             ");
             if ($statement->execute()) {
                 $result = $statement->fetchAll();

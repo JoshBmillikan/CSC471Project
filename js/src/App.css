@@ -1,9 +1,22 @@
 .App {
   text-align: center;
+  align-content: center;
+  height: 100vh;
+  background-color: silver;
+  border-color: silver;
+  border-width: 10px;
+  overflow: hidden;
+  font-family: Roboto, serif;
 }
 
+.App-Page {
+  align-content: center;
+  vertical-align: center;
+  height: 100%;
+  width: 100%;
+}
 .App-logo {
-  height: 40vmin;
+  height: 10%;
   pointer-events: none;
 }
 
@@ -13,9 +26,19 @@
   }
 }
 
+.DropDown {
+  text-align: center;
+  width: 18%;
+  margin: auto;
+  padding: 20px;
+}
+
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+  background-color: lightslategray;
+  border-color: seashell;
+  border-style: outset;
+  border-width: 8px;
+  min-height: 10vh;
   display: flex;
   flex-direction: column;
   align-items: center;
