@@ -44,6 +44,13 @@ function get($uri, $dbh) {
                 header('HTTP/1.1 502 Bad Gateway');
             }
             break;
+        case 'list':
+            $tableName = $_GET["table_name"];
+            $statement = $dbh->prepare("
+            SELECT * FROM ?;
+            ",$tableName);
+            respond(json_encode($statement->fetchAll()));
+            break;
         default: header('HTTP/1.1 404 Not Found');
     }
 }
