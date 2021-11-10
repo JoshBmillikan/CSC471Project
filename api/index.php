@@ -49,7 +49,14 @@ function get($uri, $dbh) {
             $statement = $dbh->prepare("
             SELECT * FROM ?;
             ",$tableName);
-            respond(json_encode($statement->fetchAll()));
+            if ($statement->execute()) {
+                $result = $statement->fetchAll();
+                $response['status_code_header'] = 'HTTP/1.1 200 OK';
+                $response['body'] = json_encode($result);
+                respond($response);
+            } else {
+                header('HTTP/1.1 502 Bad Gateway');
+            }
             break;
         default: header('HTTP/1.1 404 Not Found');
     }
