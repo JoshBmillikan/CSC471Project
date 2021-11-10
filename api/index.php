@@ -27,6 +27,17 @@ function respond($response) {
     }
 }
 
+function replyStatement($statement) {
+    if ($statement->execute()) {
+        $result = $statement->fetchAll();
+        $response['status_code_header'] = 'HTTP/1.1 200 OK';
+        $response['body'] = json_encode($result);
+        respond($response);
+    } else {
+        header('HTTP/1.1 502 Bad Gateway');
+    }
+}
+
 function get($uri, $dbh) {
     switch ($uri[3]) {
         case 'tables':
@@ -35,28 +46,14 @@ function get($uri, $dbh) {
             FROM INFORMATION_SCHEMA.TABLES
             WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='vaccines'
             ");
-            if ($statement->execute()) {
-                $result = $statement->fetchAll();
-                $response['status_code_header'] = 'HTTP/1.1 200 OK';
-                $response['body'] = json_encode($result);
-                respond($response);
-            } else {
-                header('HTTP/1.1 502 Bad Gateway');
-            }
+            replyStatement($statement);
             break;
         case 'list':
-            $tableName = $_GET["table_name"];
+            $tableName = $_GET["table_name"][0];
             $statement = $dbh->prepare("
             SELECT * FROM ?;
             ",$tableName);
-            if ($statement->execute()) {
-                $result = $statement->fetchAll();
-                $response['status_code_header'] = 'HTTP/1.1 200 OK';
-                $response['body'] = json_encode($result);
-                respond($response);
-            } else {
-                header('HTTP/1.1 502 Bad Gateway');
-            }
+            replyStatement($statement);
             break;
         default: header('HTTP/1.1 404 Not Found');
     }
