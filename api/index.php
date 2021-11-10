@@ -49,7 +49,8 @@ function get($uri, $dbh) {
             replyStatement($statement);
             break;
         case 'list':
-            $tableName = $_GET["table_name"][0];
+            echo $_GET["table_name"];
+            $tableName = $_GET["table_name"];
             $statement = $dbh->prepare("
             SELECT * FROM ?;
             ",$tableName);
