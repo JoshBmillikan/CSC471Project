@@ -37,7 +37,7 @@ function get($uri, $dbh) {
             $statement = $dbh->prepare("
                 SELECT * FROM ?;
             ");
-            if($statement->execute($tableName)) {
+            if($statement->execute(array($tableName))) {
                 $result = $statement->fetchAll();
                 $response['status_code_header'] = 'HTTP/1.1 200 OK';
                 $response['body'] = json_encode($result);
