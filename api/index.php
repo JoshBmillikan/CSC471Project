@@ -33,11 +33,11 @@ function respond($response) {
 function get($uri, $dbh) {
     switch ($uri[3]) {
         case 'list':
-            $tableName = $_GET["table_name"];
+            $tableName = htmlspecialchars($_GET["table_name"]).mysqli_escape_string();
             $statement = $dbh->prepare("
-                SELECT * FROM ?;
+                SELECT * FROM $tableName;
             ");
-            if($statement->execute(array($tableName))) {
+            if($statement->execute()) {
                 $result = $statement->fetchAll();
                 $response['status_code_header'] = 'HTTP/1.1 200 OK';
                 $response['body'] = json_encode($result);
