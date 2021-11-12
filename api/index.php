@@ -1,5 +1,7 @@
 <?php
 namespace api;
+use PDO;
+
 require "./connDB.php";
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -38,7 +40,7 @@ function get($uri, $dbh) {
                 SELECT * FROM $tableName;
             ");
             if($statement->execute()) {
-                $result = $statement->fetchAll();
+                $result = $statement->fetchAll(PDO::FETCH_ASSOC);
                 $response['status_code_header'] = 'HTTP/1.1 200 OK';
                 $response['body'] = json_encode($result);
                 respond($response);
