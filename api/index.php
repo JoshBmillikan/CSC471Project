@@ -54,9 +54,9 @@ function get($uri, $dbh) {
         case 'list':
             $tableName = $_GET["table_name"];
             $statement = $dbh->prepare("
-            SELECT * FROM ?;
+                SELECT * FROM ?;
             ");
-            $statement->bindParam(1,$tableName);
+            $statement->bind_param(1,$tableName);
             replyStatement($statement);
             break;
         default: header('HTTP/1.1 404 Not Found');
