@@ -33,7 +33,7 @@ function respond($response) {
 function get($uri, $dbh) {
     switch ($uri[3]) {
         case 'list':
-            $tableName = htmlspecialchars($_GET["table_name"]).mysqli_escape_string();
+            $tableName = htmlspecialchars($_GET["table_name"]);
             $statement = $dbh->prepare("
                 SELECT * FROM $tableName;
             ");
