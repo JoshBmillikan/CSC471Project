@@ -1,9 +1,8 @@
 import './App.css';
 import Select from 'react-select';
-import AsyncSelect from 'react-select/async';
-import {waitForElementToBeRemoved} from "@testing-library/react";
+import React from "react";
 import "typeface-roboto"
-import {Table} from "./table"
+import {SQLTable} from "./table"
 import {useState} from "react";
 
 const options = [
@@ -19,12 +18,12 @@ const options = [
 
 function App() {
     const [currentTable, setCurrentTable] = useState(null);
+
     return (
         <div className="App">
             <header className="App-header">
-                CSC-471 Project
+                CSC-471 Project {currentTable}
             </header>
-            <body>
             <span>
                 <Select
                     className="DropDown"
@@ -37,15 +36,12 @@ function App() {
                         } else setCurrentTable(null)
                     }}
                 > </Select>
-                        </span>
-            <div
-                style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '30%'}}
-            >
-                {currentTable != null && <Table
-                    tableName={currentTable}/>
+            </span>
+            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '30%'}}>
+                {currentTable != null &&
+                    <SQLTable currentTable={currentTable}/>
                 }
             </div>
-            </body>
         </div>
 
     );
