@@ -1,39 +1,49 @@
 import './App.css';
 import Select from 'react-select';
-import AsyncSelect from 'react-select/async';
-import {waitForElementToBeRemoved} from "@testing-library/react";
+import React from "react";
+import "typeface-roboto"
+import {SQLTable} from "./table"
+import {useState} from "react";
 
 const options = [
     {value: 'patient', label: 'Patients'},
     {value: 'vaccine', label: 'Vaccines'},
     {value: 'allergy', label: 'Allergies'},
+    {value: 'takes', label: 'Takes'},
+    {value: 'vaccination_site', label: 'Vaccination Site'},
+    {value: 'lot', label: "Lot"},
+    {value: 'billing', label: 'Billing'}
 ];
 
-const url = "https://csc471f21-millikan-joshua.azurewebsites.net/php/API";
 
 function App() {
-    const loadOptions = (input) => {
-        return fetch(url + "/api/tables").then(
-            (response) => {
-                if (response.status === 200) {
-                    return response.json()
-                }
-            }
-        )
-    }
+    const [currentTable, setCurrentTable] = useState(null);
+
     return (
         <div className="App">
             <header className="App-header">
+                CSC-471 Project {currentTable}
             </header>
-            <body>
-            <AsyncSelect
-                cacheOptions
-                defaultOptions
-                loadOptions={loadOptions}
-            >
-            </AsyncSelect>
-            </body>
+            <span>
+                <Select
+                    className="DropDown"
+                    options={options}
+                    isClearable
+                    isSearchable
+                    onChange={(it) => {
+                        if (it != null) {
+                            setCurrentTable(it.value)
+                        } else setCurrentTable(null)
+                    }}
+                > </Select>
+            </span>
+            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '30%'}}>
+                {currentTable != null &&
+                    <SQLTable currentTable={currentTable}/>
+                }
+            </div>
         </div>
+
     );
 }
 
