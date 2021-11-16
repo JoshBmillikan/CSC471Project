@@ -1,18 +1,24 @@
 import {useEffect, useState, useMemo} from "react";
 import {useTable} from "react-table";
+import {DotLoader} from "react-spinners";
+import {css} from "@emotion/react";
 
 export function SQLTable(currentTable) {
     const [tableData, setTableData] = useState(null)
+    const [loading, setLoading] = useState(true);
+
     useEffect(() => {
+        setLoading(true)
         if (currentTable != null) {
             async function getData() {
                 const str = currentTable.currentTable;
                 const response = await fetch(`https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/list/?table_name=${str}`)
-                if(response.ok) {
+                if (response.ok) {
                     const data = await response.json()
                     console.log(data)
                     if (data.length > 0) {
                         setTableData(data)
+                        setLoading(false)
                     } else setTableData(null)
                 } else {
                     console.error(response.error())
@@ -35,7 +41,7 @@ export function SQLTable(currentTable) {
                     }
                 )
             }
-            return  [
+            return [
                 {
                     Header: 'placeholder',
                     accessor: 'placeholder',
@@ -44,9 +50,9 @@ export function SQLTable(currentTable) {
         },
         [tableData]
     )
-    const rowData =  useMemo(() => tableData != null ? tableData : [{placeholder:"bla"}],[tableData])
+    const rowData = useMemo(() => tableData != null ? tableData : [{placeholder: "bla"}], [tableData])
 
-    const tableInstance = useTable({ columns, data: rowData })
+    const tableInstance = useTable({columns, data: rowData})
 
     const {
         getTableProps,
@@ -56,6 +62,14 @@ export function SQLTable(currentTable) {
         prepareRow,
     } = tableInstance
 
+    const loaderCss = css`
+      border-width: 10px;
+      border-color: azure;
+    `;
+
+    if (loading) {
+        return (<DotLoader loading={loading} css={loaderCss} color={'#0079fa'} />)
+    }
     return (
         <table {...getTableProps()}>
             <thead>
