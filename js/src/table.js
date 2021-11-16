@@ -35,7 +35,7 @@ export function SQLTable(currentTable) {
                 return Object.getOwnPropertyNames(tableData[0]).map(
                     (it) => {
                         return {
-                            Header: it,
+                            Header: it.replaceAll(/_/g, ' '),
                             accessor: it
                         }
                     }
@@ -65,6 +65,7 @@ export function SQLTable(currentTable) {
     const loaderCss = css`
       border-width: 10px;
       border-color: azure;
+      margin-top: 10vh;
     `;
 
     if (loading) {
