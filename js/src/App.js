@@ -6,13 +6,13 @@ import {SQLTable} from "./table"
 import {useState} from "react";
 
 const options = [
-    {value: 'patient', label: 'Patients'},
-    {value: 'vaccine', label: 'Vaccines'},
-    {value: 'allergy', label: 'Allergies'},
-    {value: 'takes', label: 'Takes'},
-    {value: 'vaccination_site', label: 'Vaccination Site'},
-    {value: 'lot', label: "Lot"},
-    {value: 'billing', label: 'Billing'}
+    {value: 'patient', label: 'Patients', pkey: ''},
+    {value: 'vaccine', label: 'Vaccines', pkey: 'sci_name'},
+    {value: 'allergy', label: 'Allergies', pkey: ''},
+    {value: 'takes', label: 'Takes', pkey: ''},
+    {value: 'vaccination_site', label: 'Vaccination Site', pkey: ''},
+    {value: 'lot', label: "Lot", pkey: ''},
+    {value: 'billing', label: 'Billing', pkey: ''}
 ];
 
 

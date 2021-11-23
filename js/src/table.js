@@ -3,9 +3,22 @@ import {useTable} from "react-table";
 import {DotLoader} from "react-spinners";
 import {css} from "@emotion/react";
 
+async function updateData(row,tableName,column,value) {
+    let data = {
+        table: tableName,
+        column: column,
+        value: value,
+        row: row
+    }
+    let response = await fetch('https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/update/', {
+        method: 'POST',
+        body: JSON.stringify(data)
+    })
+}
+
 export function SQLTable(currentTable) {
     const [tableData, setTableData] = useState(null)
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         setLoading(true)
@@ -52,7 +65,28 @@ export function SQLTable(currentTable) {
     )
     const rowData = useMemo(() => tableData != null ? tableData : [{placeholder: "bla"}], [tableData])
 
-    const tableInstance = useTable({columns, data: rowData})
+    const EditableCell = ({value: initialValue, row: {index}, column: {id}, updateData,}) => {
+        const [value, setValue] = useState(initialValue)
+        const onChange = e => {
+            setValue(e.target.value)
+        }
+        useEffect(() => {
+            let old = initialValue
+            setValue(initialValue)
+            updateData(tableData[index],currentTable.currentTable,id,value).then((it)=>{
+                if(!it) {
+                    setValue(old)
+                }
+            })
+        }, [initialValue])
+        return <input value={value} onChange={onChange} />
+    }
+
+    const defaultColumn = {
+        Cell: EditableCell,
+    }
+
+    const tableInstance = useTable({columns, data: rowData, defaultColumn, updateData})
 
     const {
         getTableProps,
@@ -69,7 +103,7 @@ export function SQLTable(currentTable) {
     `;
 
     if (loading) {
-        return (<DotLoader loading={loading} css={loaderCss} color={'#0079fa'} />)
+        return (<DotLoader loading={loading} css={loaderCss} color={'#0079fa'}/>)
     }
     return (
         <table {...getTableProps()}>
