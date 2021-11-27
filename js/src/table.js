@@ -73,6 +73,7 @@ export function SQLTable(currentTable) {
         useEffect(() => {
             let old = initialValue
             setValue(initialValue)
+            alert(`PKey: ${currentTable.pkey}`)
             updateData(tableData[index],currentTable.currentTable,id,value).then((it)=>{
                 if(!it) {
                     setValue(old)
