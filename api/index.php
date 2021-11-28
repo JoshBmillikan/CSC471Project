@@ -65,8 +65,8 @@ function post($uri, $dbh) {
             $post = readPost();
             $statement = $dbh->prepare("
                 DELETE FROM $post->table_name WHERE $post->pkey_name = ?;
-            ", [$post->pkey_value]);
-            $statement->execute();
+            ");
+            $statement->execute(array($post->pkey_value));
             header('HTTP/1.1 200 OK');
             break;
         case 'update':
