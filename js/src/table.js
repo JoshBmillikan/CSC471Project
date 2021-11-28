@@ -23,7 +23,8 @@ function DeleteButton(rowData,currentTable) {
                 "https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/delete",
                 {
                     method: 'post',
-                    body: JSON.stringify(data)
+
+                    body: JSON.stringify(data),
                 }
             )
             alert((await response).toString())
