@@ -54,15 +54,18 @@ function get($uri, $dbh) {
     }
 }
 
+function readPost() {
+    $json = file_get_contents('php://input');
+    return json_decode($json);
+}
+
 function post($uri, $dbh) {
     switch ($uri[3]) {
         case 'delete':
-            $tableName = htmlspecialchars($_POST["table_name"]);
-            $pkeyName = htmlspecialchars($_POST["pkey_name"]);
-            $pkeyVal = htmlspecialchars($_POST["pkey_value"]);
+            $post = readPost();
             $statement = $dbh->prepare("
-                DELETE FROM $tableName WHERE $pkeyName = ?;
-            ", [$pkeyVal]);
+                DELETE FROM $post->table_name WHERE $post->pkey_name = ?;
+            ", [$post->pkey_val]);
             $statement->execute();
             header('HTTP/1.1 200 OK');
             break;

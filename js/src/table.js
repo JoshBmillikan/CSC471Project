@@ -13,15 +13,17 @@ function DeleteButton(rowData,currentTable) {
     const deleteFn = () => {
         async function del() {
             const pkey = currentTable.currentTable[1];
+            const data = {
+                table_name: currentTable.currentTable[0],
+                pkey_name: pkey,
+                pkey_value: rowData[pkey]
+            }
+
             const response = await fetch(
                 "https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/delete",
                 {
                     method: 'post',
-                    body:`
-                        table_name=${currentTable.currentTable[0]},\n
-                        pkey_name=${pkey},\n
-                        pkey_value=${rowData[pkey]},\n
-                    `
+                    body: JSON.stringify(data)
                 }
             )
             alert((await response).toString())
