@@ -6,13 +6,13 @@ import {SQLTable} from "./table"
 import {useState} from "react";
 
 const options = [
-    {value: 'patient', label: 'Patients', pkey: ''},
-    {value: 'vaccine', label: 'Vaccines', pkey: 'sci_name'},
-    {value: 'allergy', label: 'Allergies', pkey: ''},
-    {value: 'takes', label: 'Takes', pkey: ''},
-    {value: 'vaccination_site', label: 'Vaccination Site', pkey: ''},
-    {value: 'lot', label: "Lot", pkey: ''},
-    {value: 'billing', label: 'Billing', pkey: ''}
+    {value: {name: 'patient', pkey: ''}, label: 'Patients'},
+    {value: {name: 'vaccine', pkey: 'sci_name'}, label: 'Vaccines'},
+    {value: {name: 'allergy', pkey: ''}, label: 'Allergies'},
+    {value: {name: 'takes', pkey: ''}, label: 'Takes'},
+    {value: {name: 'vaccination_site', pkey:''}, label: 'Vaccination Site'},
+    {value: {name: 'lot',pkey:''}, label: "Lot"},
+    {value: {name: 'billing', pkey: ''}, label: 'Billing'}
 ];
 
 
@@ -39,7 +39,9 @@ function App() {
             </span>
             <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '30%'}}>
                 {currentTable != null &&
-                    <SQLTable currentTable={currentTable}/>
+                    <SQLTable
+                        currentTable={currentTable}
+                    />
                 }
             </div>
         </div>
