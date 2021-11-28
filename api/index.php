@@ -62,7 +62,7 @@ function post($uri, $dbh) {
             $pkeyVal = htmlspecialchars($_POST["pkey_value"]);
             $statement = $dbh->prepare("
                 DELETE FROM $tableName WHERE $pkeyName = ?;
-            ", $pkeyVal);
+            ", [$pkeyVal]);
             $statement->execute();
             header('HTTP/1.1 200 OK');
             break;
@@ -79,7 +79,7 @@ function post($uri, $dbh) {
             $statement = $dbh->prepare("
                 INSERT INTO $tableName
                 VALUES($question)
-            ",$columns);
+            ",[$columns]);
             $statement->execute();
             break;
         default: header('HTTP/1.1 400 Bad Request');

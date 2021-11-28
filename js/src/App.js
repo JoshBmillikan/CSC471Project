@@ -5,14 +5,15 @@ import "typeface-roboto"
 import {SQLTable} from "./table"
 import {useState} from "react";
 
+// names of all tables and their primary keys
 const options = [
-    {value: {name: 'patient', pkey: ''}, label: 'Patients'},
-    {value: {name: 'vaccine', pkey: 'sci_name'}, label: 'Vaccines'},
-    {value: {name: 'allergy', pkey: ''}, label: 'Allergies'},
-    {value: {name: 'takes', pkey: ''}, label: 'Takes'},
-    {value: {name: 'vaccination_site', pkey:''}, label: 'Vaccination Site'},
-    {value: {name: 'lot',pkey:''}, label: "Lot"},
-    {value: {name: 'billing', pkey: ''}, label: 'Billing'}
+    {value: ['patient', ''], label: 'Patients'},
+    {value: ['vaccine', 'sci_name'], label: 'Vaccines'},
+    {value: ['allergy', ''], label: 'Allergies'},
+    {value: ['takes', ''], label: 'Takes'},
+    {value: ['vaccination_site',''], label: 'Vaccination Site'},
+    {value: ['lot', ''], label: "Lot"},
+    {value: ['billing', ''], label: 'Billing'}
 ];
 
 

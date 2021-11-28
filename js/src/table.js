@@ -1,19 +1,56 @@
 import {useEffect, useState, useMemo} from "react";
 import {useTable} from "react-table";
 import {DotLoader} from "react-spinners";
+/** @jsxImportSource @emotion/react */
 import {css} from "@emotion/react";
 
-async function updateData(row,tableName,column,value) {
-    // let data = {
-    //     table: tableName,
-    //     column: column,
-    //     value: value,
-    //     row: row
-    // }
-    // let response = await fetch('https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/update/', {
-    //     method: 'POST',
-    //     body: JSON.stringify(data)
-    // })
+async function updateData(index, id, newValue, pkey, tableName) {
+
+}
+
+function DeleteButton(rowData,currentTable) {
+
+    const deleteFn = () => {
+        async function del() {
+            const pkey = currentTable.currentTable[1];
+            const response = await fetch(
+                "https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/delete",
+                {
+                    method: 'post',
+                    body:`
+                        table_name=${currentTable.currentTable[0]},\n
+                        pkey_name=${pkey},\n
+                        pkey_value=${rowData[pkey]},\n
+                    `
+                }
+            )
+            alert((await response).toString())
+            if(!response.ok) {
+                console.error(response.error())
+            }
+        }
+
+
+        del()
+    }
+
+    return (
+        <button
+            css={css`
+              border: transparent;
+              background: transparent;
+              font-size: large;
+              color: dimgray;
+
+              &:hover {
+                font-weight: bold;
+                background: red;
+                color: white;
+              }
+            `}
+            onClick={deleteFn}
+        > X </button>
+    )
 }
 
 export function SQLTable(currentTable) {
@@ -21,16 +58,15 @@ export function SQLTable(currentTable) {
     const [loading, setLoading] = useState(true)
 
     const pkey = useMemo(() => {
-        return currentTable.currentTable.pkey
-    },[currentTable])
+        return currentTable.currentTable[1]
+    }, [currentTable])
     useEffect(() => {
         setLoading(true)
         if (currentTable != null) {
             async function getData() {
-                const response = await fetch(`https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/list/?table_name=${currentTable.currentTable.name}`)
+                const response = await fetch(`https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/list/?table_name=${currentTable.currentTable[0]}`)
                 if (response.ok) {
                     const data = await response.json()
-                    console.log(data)
                     if (data.length > 0) {
                         setTableData(data)
                         setLoading(false)
@@ -47,14 +83,23 @@ export function SQLTable(currentTable) {
     const columns = useMemo(
         () => {
             if (tableData != null) {
-                return Object.getOwnPropertyNames(tableData[0]).map(
+                const cells = Object.getOwnPropertyNames(tableData[0]).map(
                     (it) => {
                         return {
+                            // replace underscores with spaces
                             Header: it.replaceAll(/_/g, ' '),
                             accessor: it
                         }
                     }
                 )
+                return [...cells,
+                    {
+                        Header: ' ',
+                        Cell: ({row: {index}}) => {
+                            return DeleteButton(tableData[index],currentTable)
+                        }
+                    }
+                ]
             }
             return [
                 {
@@ -63,15 +108,15 @@ export function SQLTable(currentTable) {
                 }
             ]
         },
-        [tableData]
+        [tableData,currentTable]
     )
     const rowData = useMemo(() => tableData != null ? tableData : [{placeholder: "bla"}], [tableData])
 
     // Create an editable cell renderer
     const EditableCell = ({
                               value: initialValue,
-                              row: { index },
-                              column: { id },
+                              row: {index},
+                              column: {id},
                               updateData, // This is a custom function that we supplied to our table instance
                           }) => {
         // We need to keep and update the state of the cell normally
@@ -83,7 +128,12 @@ export function SQLTable(currentTable) {
         // We'll only update the external data when the input is blurred
         const onBlur = () => {
             alert(`PKey: ${JSON.stringify(pkey)}`)
-            updateData(index, id, value)
+            updateData(index, id, value, pkey, currentTable.currentTable).then((result) => {
+                //todo error handling
+                if (!result.ok) {
+
+                }
+            })
         }
 
         // If the initialValue is changed external, sync it up with our state
@@ -91,7 +141,7 @@ export function SQLTable(currentTable) {
             setValue(initialValue)
         }, [initialValue])
 
-        return <input value={value} onChange={onChange} onBlur={onBlur} />
+        return <input value={value} onChange={onChange} onBlur={onBlur}/>
     }
 
 // Set our editable cell renderer as the default Cell renderer
@@ -109,14 +159,13 @@ export function SQLTable(currentTable) {
         prepareRow,
     } = tableInstance
 
-    const loaderCss = css`
-      border-width: 10px;
-      border-color: azure;
-      margin-top: 10vh;
-    `;
 
     if (loading) {
-        return (<DotLoader loading={loading} css={loaderCss} color={'#0079fa'}/>)
+        return (<DotLoader loading={loading} css={css`
+          border-width: 10px;
+          border-color: azure;
+          margin-top: 10vh;
+        `} color={'#0079fa'}/>)
     }
     return (
         <table {...getTableProps()}>
