@@ -56,7 +56,7 @@ function get($uri, $dbh) {
 
 function readPost() {
     $json = file_get_contents('php://input');
-    return json_decode($json);
+    return json_decode(addslashes($json));
 }
 
 function post($uri, $dbh) {
@@ -70,20 +70,24 @@ function post($uri, $dbh) {
             header('HTTP/1.1 200 OK');
             break;
         case 'update':
-            $tableName = htmlspecialchars($_POST["table_name"]);
-            $pkeyName = htmlspecialchars($_POST["pkey_name"]);
-            $pkeyVal = htmlspecialchars($_POST["pkey_value"]);
-            //todo
+            $post = readPost();
+            $statement = $dbh->prepare("
+                UPDATE $post->table_name
+                SET $post->column_name = ?
+                WHERE $post->pkey_name = ?
+            ");
+            $statement->execute(array($post->colum_value, $post->pkey_vaule));
+            header('HTTP/1.1 200 OK');
             break;
         case 'create':
-            $tableName = htmlspecialchars($_POST["table_name"]);
-            $columns = preg_split(",",htmlspecialchars($_POST["columns"]));
-            $question = str_repeat("?,",count($columns) - 1) . '?';
+            $post = readPost();
+            $question = str_repeat("?,",count($post->columns) - 1) . '?';
             $statement = $dbh->prepare("
-                INSERT INTO $tableName
+                INSERT INTO $post->tableName
                 VALUES($question)
-            ",[$columns]);
-            $statement->execute();
+            ");
+            $statement->execute($post->columns);
+            header('HTTP/1.1 200 OK');
             break;
         default: header('HTTP/1.1 400 Bad Request');
     }

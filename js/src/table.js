@@ -3,38 +3,65 @@ import {useTable} from "react-table";
 import {DotLoader} from "react-spinners";
 /** @jsxImportSource @emotion/react */
 import {css} from "@emotion/react";
+import {createPortal} from "react-dom";
 
-async function updateData(index, id, newValue, pkey, tableName) {
-
+// Fetch the table data from the server
+async function getData(currentTable, setTableData, setLoading) {
+    const response = await fetch(`https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/list/?table_name=${currentTable.currentTable[0]}`)
+    if (response.ok) {
+        const data = await response.json()
+        if (data.length > 0) {
+            setTableData(data)
+            setLoading(false)
+        } else setTableData(null)
+    } else {
+        console.error(response.error())
+    }
 }
 
-function DeleteButton(rowData,currentTable) {
-
-    const deleteFn = () => {
-        async function del() {
-            const pkey = currentTable.currentTable[1];
-            const data = {
-                table_name: currentTable.currentTable[0],
-                pkey_name: pkey,
-                pkey_value: rowData[pkey]
-            }
-
-            const response = await fetch(
-                "https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/delete",
-                {
-                    method: 'post',
-
-                    body: JSON.stringify(data),
-                }
-            )
-            alert((await response).toString())
-            if(!response.ok) {
-                console.error(response.error())
-            }
+// Sends an update request to change a column in a row
+async function updateData(rowData, columnName, currentTable, setTableData, setLoading) {
+    setLoading(true)
+    const pkey = currentTable.currentTable[1];
+    const data = {
+        table_name: currentTable.currentTable[0],
+        pkey_name: pkey,
+        pkey_value: rowData[pkey],
+        column_name: columnName,
+        column_value: rowData[columnName]
+    }
+    const response = await fetch(
+        "https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/update",
+        {
+            method: 'post',
+            body: JSON.stringify(data),
         }
+    )
 
+    await getData(currentTable, setTableData, setLoading)
+}
 
-        del()
+// Button component to remove a row when clicked
+function DeleteButton(rowData, currentTable, setTableData, setLoading) {
+    const deleteFn = async () => {
+        setLoading(true)
+        const pkey = currentTable.currentTable[1];
+        const data = {
+            table_name: currentTable.currentTable[0],
+            pkey_name: pkey,
+            pkey_value: rowData[pkey]
+        }
+        const response = await fetch(
+            "https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/delete",
+            {
+                method: 'post',
+                body: JSON.stringify(data),
+            }
+        )
+        if (!response.ok) {
+            console.error(response.error())
+        }
+        await getData(currentTable, setTableData, setLoading)
     }
 
     return (
@@ -56,6 +83,49 @@ function DeleteButton(rowData,currentTable) {
     )
 }
 
+// Window component to enter data for new row
+function InsertWindow(rowNames, callback) {
+
+    return (
+        <div>
+
+        </div>
+    )
+}
+
+// Button component to create a new row
+function InsertButton(rowNames, currentTable, setTableData, setLoading) {
+    const insertFn = async () => {
+        const data = {
+            table_name: currentTable.currentTable[0],
+            pkey_name: currentTable.currentTable[1],
+        }
+        const response = await fetch(
+            "https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/create",
+            {
+                method: 'post',
+                body: JSON.stringify(data),
+            }
+        )
+
+        await getData(currentTable, setTableData, setLoading)
+    }
+
+    return (
+        <button
+            css={css`
+            `}
+            onClick={() => {
+                createPortal(() => {
+                    return InsertWindow(rowNames, insertFn)
+                }, document.body)
+            }}
+        > + </button>
+    )
+
+}
+
+// The table component to display the data from the database
 export function SQLTable(currentTable) {
     const [tableData, setTableData] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -66,20 +136,7 @@ export function SQLTable(currentTable) {
     useEffect(() => {
         setLoading(true)
         if (currentTable != null) {
-            async function getData() {
-                const response = await fetch(`https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/list/?table_name=${currentTable.currentTable[0]}`)
-                if (response.ok) {
-                    const data = await response.json()
-                    if (data.length > 0) {
-                        setTableData(data)
-                        setLoading(false)
-                    } else setTableData(null)
-                } else {
-                    console.error(response.error())
-                }
-            }
-
-            getData()
+            getData(currentTable, setTableData, setLoading)
         }
     }, [currentTable])
 
@@ -97,9 +154,12 @@ export function SQLTable(currentTable) {
                 )
                 return [...cells,
                     {
-                        Header: ' ',
+                        Header: () => {
+                            return InsertButton(Object.getOwnPropertyNames(tableData[0]), currentTable, setTableData, setLoading)
+                        },
+                        accessor: 'buttons',
                         Cell: ({row: {index}}) => {
-                            return DeleteButton(tableData[index],currentTable)
+                            return DeleteButton(tableData[index], currentTable, setTableData, setLoading)
                         }
                     }
                 ]
@@ -111,7 +171,7 @@ export function SQLTable(currentTable) {
                 }
             ]
         },
-        [tableData,currentTable]
+        [tableData, currentTable]
     )
     const rowData = useMemo(() => tableData != null ? tableData : [{placeholder: "bla"}], [tableData])
 
@@ -131,12 +191,7 @@ export function SQLTable(currentTable) {
         // We'll only update the external data when the input is blurred
         const onBlur = () => {
             alert(`PKey: ${JSON.stringify(pkey)}`)
-            updateData(index, id, value, pkey, currentTable.currentTable).then((result) => {
-                //todo error handling
-                if (!result.ok) {
-
-                }
-            })
+            updateData(tableData[index],id.accessor,currentTable,setTableData,setLoading)
         }
 
         // If the initialValue is changed external, sync it up with our state
@@ -170,6 +225,7 @@ export function SQLTable(currentTable) {
           margin-top: 10vh;
         `} color={'#0079fa'}/>)
     }
+
     return (
         <table {...getTableProps()}>
             <thead>

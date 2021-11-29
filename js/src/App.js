@@ -7,10 +7,10 @@ import {useState} from "react";
 
 // names of all tables and their primary keys
 const options = [
-    {value: ['patient', ''], label: 'Patients'},
+    {value: ['patient', 'id'], label: 'Patients'},
     {value: ['vaccine', 'sci_name'], label: 'Vaccines'},
-    {value: ['allergy', ''], label: 'Allergies'},
-    {value: ['takes', ''], label: 'Takes'},
+    {value: ['allergy', 'patient_id'], label: 'Allergies'},
+    {value: ['takes', 'patient_id'], label: 'Takes'},
     {value: ['vaccination_site',''], label: 'Vaccination Site'},
     {value: ['lot', ''], label: "Lot"},
     {value: ['billing', ''], label: 'Billing'}
@@ -23,7 +23,7 @@ function App() {
     return (
         <div className="App">
             <header className="App-header">
-                CSC-471 Project {currentTable}
+                CSC-471 Project
             </header>
             <span>
                 <Select
