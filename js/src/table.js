@@ -175,26 +175,22 @@ export function SQLTable(currentTable) {
     )
     const rowData = useMemo(() => tableData != null ? tableData : [{placeholder: "bla"}], [tableData])
 
-    // Create an editable cell renderer
+    // Create an editable cell
     const EditableCell = ({
                               value: initialValue,
                               row: {index},
                               column: {id},
-                              updateData, // This is a custom function that we supplied to our table instance
+                              updateData,
                           }) => {
-        // We need to keep and update the state of the cell normally
         const [value, setValue] = useState(initialValue)
         const onChange = e => {
             setValue(e.target.value)
         }
 
-        // We'll only update the external data when the input is blurred
         const onBlur = () => {
-            alert(`PKey: ${JSON.stringify(pkey)}`)
             updateData(tableData[index],id.accessor,currentTable,setTableData,setLoading)
         }
 
-        // If the initialValue is changed external, sync it up with our state
         useEffect(() => {
             setValue(initialValue)
         }, [initialValue])
