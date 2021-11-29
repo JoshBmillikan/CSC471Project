@@ -38,7 +38,7 @@ function respond($response)
 function readPost()
 {
     $json = file_get_contents('php://input');
-    return json_decode(addslashes($json));
+    return json_decode($json);
 }
 
 switch ($uri[3]) {
