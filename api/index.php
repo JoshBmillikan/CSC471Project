@@ -55,9 +55,9 @@ switch ($uri[3]) {
         $statement = $dbh->prepare("
                 UPDATE $post->table_name 
                 SET $post->column_name = ? 
-                WHERE $post->pkey_name = ? 
+                WHERE $post->pkey_name = ?;
             ");
-        $statement->execute(array($post->colum_value, $post->pkey_vaule));
+        $statement->execute(array($post->column_value, $post->pkey_value));
         header('HTTP/1.1 200 OK');
         break;
     case 'create':
@@ -65,7 +65,7 @@ switch ($uri[3]) {
         $question = str_repeat("?,", count($post->columns) - 1) . '?';
         $statement = $dbh->prepare("
                 INSERT INTO $post->tableName
-                VALUES($question)
+                VALUES($question);
             ");
         $statement->execute($post->columns);
         header('HTTP/1.1 200 OK');
