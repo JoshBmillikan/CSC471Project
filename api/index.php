@@ -10,7 +10,6 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 // for testing
 header("Access-Control-Allow-Origin: *");
-
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: OPTIONS,GET,POST,DELETE,UPDATE");
 header("Access-Control-Max-Age: 3600");
@@ -36,15 +35,6 @@ function respond($response)
     }
 }
 
-function get($uri, $dbh)
-{
-    switch ($uri[3]) {
-
-        default:
-            header('HTTP/1.1 404 Not Found');
-    }
-}
-
 function readPost()
 {
     $json = file_get_contents('php://input');
@@ -63,9 +53,9 @@ switch ($uri[3]) {
     case 'update':
         $post = readPost();
         $statement = $dbh->prepare("
-                UPDATE $post->table_name
-                SET $post->column_name = ?
-                WHERE $post->pkey_name = ?
+                UPDATE $post->table_name 
+                SET $post->column_name = ? 
+                WHERE $post->pkey_name = ? 
             ");
         $statement->execute(array($post->colum_value, $post->pkey_vaule));
         header('HTTP/1.1 200 OK');
