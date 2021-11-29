@@ -1,5 +1,7 @@
 <?php
+
 namespace api;
+
 use PDO;
 
 require "./connDB.php";
@@ -10,12 +12,12 @@ error_reporting(E_ALL);
 header("Access-Control-Allow-Origin: *");
 
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: OPTIONS,GET,POST");
+header("Access-Control-Allow-Methods: OPTIONS,GET,POST,DELETE,UPDATE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$uri = explode( '/', $uri );
+$uri = explode('/', $uri);
 
 if ($uri[1] !== 'api') {
     header("HTTP/1.1 404 Not Found");
@@ -26,21 +28,23 @@ $dbh = get_db();
 
 $requestMethod = $_SERVER["REQUEST_METHOD"];
 
-function respond($response) {
+function respond($response)
+{
     header($response['status_code_header']);
     if ($response['body']) {
         echo $response['body'];
     }
 }
 
-function get($uri, $dbh) {
+function get($uri, $dbh)
+{
     switch ($uri[3]) {
         case 'list':
             $tableName = htmlspecialchars($_GET["table_name"]);
             $statement = $dbh->prepare("
                 SELECT * FROM $tableName;
             ");
-            if($statement->execute()) {
+            if ($statement->execute()) {
                 $result = $statement->fetchAll(PDO::FETCH_ASSOC);
                 $response['status_code_header'] = 'HTTP/1.1 200 OK';
                 $response['body'] = json_encode($result);
@@ -50,16 +54,19 @@ function get($uri, $dbh) {
             }
 
             break;
-        default: header('HTTP/1.1 404 Not Found');
+        default:
+            header('HTTP/1.1 404 Not Found');
     }
 }
 
-function readPost() {
+function readPost()
+{
     $json = file_get_contents('php://input');
     return json_decode(addslashes($json));
 }
 
-function post($uri, $dbh) {
+function post($uri, $dbh)
+{
     switch ($uri[3]) {
         case 'delete':
             $post = readPost();
@@ -81,7 +88,7 @@ function post($uri, $dbh) {
             break;
         case 'create':
             $post = readPost();
-            $question = str_repeat("?,",count($post->columns) - 1) . '?';
+            $question = str_repeat("?,", count($post->columns) - 1) . '?';
             $statement = $dbh->prepare("
                 INSERT INTO $post->tableName
                 VALUES($question)
@@ -89,16 +96,18 @@ function post($uri, $dbh) {
             $statement->execute($post->columns);
             header('HTTP/1.1 200 OK');
             break;
-        default: header('HTTP/1.1 400 Bad Request');
+        default:
+            header('HTTP/1.1 400 Bad Request');
     }
 }
 
 switch (strtoupper($requestMethod)) {
     case 'GET':
-        get($uri,$dbh);
+        get($uri, $dbh);
         break;
     case 'POST':
-        post($uri,$dbh);
+        post($uri, $dbh);
         break;
-    default: header('HTTP/1.1 400 Bad Request');
+    default:
+        header('HTTP/1.1 400 Bad Request');
 }

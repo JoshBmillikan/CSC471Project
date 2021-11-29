@@ -33,7 +33,7 @@ async function updateData(rowData, columnName, currentTable, setTableData, setLo
     const response = await fetch(
         "https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/update",
         {
-            method: 'post',
+            method: 'update',
             body: JSON.stringify(data),
         }
     )
@@ -54,7 +54,7 @@ function DeleteButton(rowData, currentTable, setTableData, setLoading) {
         const response = await fetch(
             "https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/delete",
             {
-                method: 'post',
+                method: 'delete',
                 body: JSON.stringify(data),
             }
         )
