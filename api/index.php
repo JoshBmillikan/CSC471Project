@@ -64,10 +64,10 @@ switch ($uri[3]) {
         $post = readPost();
         $question = str_repeat("?,", count($post->columns) - 1) . '?';
         $statement = $dbh->prepare("
-                INSERT INTO $post->tableName
+                INSERT INTO $post->table_name
                 VALUES($question);
             ");
-        $statement->execute($post->columns);
+        $statement->execute($post->column_data);
         header('HTTP/1.1 200 OK');
         break;
     case 'list':

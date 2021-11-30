@@ -4,8 +4,10 @@ import Modal from "react-modal";
 import {css} from "@emotion/react";
 import {getData} from "./data";
 
-export function InsertModal(rowNames, columnData, currentTable, setTableData, setLoading) {
+export function InsertModal(props) {
     const [modalOpen, setModalOpen] = useState(false)
+
+    const {rowNames, columnData, currentTable, setTableData, setLoading} = props
     Modal.setAppElement('#root');
     const insertFn = async () => {
         setLoading(true)
@@ -68,7 +70,7 @@ export function InsertModal(rowNames, columnData, currentTable, setTableData, se
                         insertFn()
                     }}
                 >
-                    {rowNames.rowNames.map((name) => {
+                    {rowNames.map((name) => {
                         return (
                             <div css={css`
                               display: block;

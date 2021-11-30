@@ -1,4 +1,4 @@
-import {useEffect, useState, useMemo} from "react";
+import {useEffect, useState, useMemo, useCallback} from "react";
 import {useTable} from "react-table";
 import {DotLoader} from "react-spinners";
 /** @jsxImportSource @emotion/react */
@@ -47,20 +47,6 @@ function DeleteButton(rowData, currentTable, setTableData, setLoading) {
             onClick={deleteFn}
         > X </button>
     )
-}
-
-
-// I have no idea why, but using InsertModal directly crashes, but this works fine
-function InsertButton(rowNames, currentTable, setTableData, setLoading) {
-    return (
-        <InsertModal
-            rowNames={rowNames}
-            currentTable={currentTable}
-            setTableData={setTableData}
-            setLoading={setLoading}
-        />
-    )
-
 }
 
 const TableStyles = styled.div`
@@ -123,7 +109,12 @@ export function SQLTable(currentTable) {
                 return [...cells,
                     {
                         Header: () => {
-                            return InsertButton(Object.getOwnPropertyNames(tableData[0]), currentTable, setTableData, setLoading)
+                            return (<InsertModal
+                                rowNames={Object.getOwnPropertyNames(tableData[0])}
+                                currentTable={currentTable}
+                                setTableData={setTableData}
+                                setLoading={setLoading}
+                            />)
                         },
                         accessor: 'buttons',
                         Cell: ({row: {index}}) => {

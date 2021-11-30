@@ -12,8 +12,6 @@ const options = [
     {value: ['allergy', 'patient_id'], label: 'Allergies'},
     {value: ['takes', 'patient_id'], label: 'Takes'},
     {value: ['vaccination_site',''], label: 'Vaccination Site'},
-    {value: ['lot', ''], label: "Lot"},
-    {value: ['billing', ''], label: 'Billing'}
 ];
 
 
