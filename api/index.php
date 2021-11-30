@@ -90,10 +90,14 @@ try {
             header('HTTP/1.1 200 OK');
             break;
         case 'list':
-            $tableName = htmlspecialchars($_GET["table_name"]);
+            $tableName = $_GET["table_name"];
+            if (!array_key_exists($tableName, validNames))
+                throw new Exception('table name is not valid');
             $sql = "SELECT * FROM $tableName ";
             if(isset($_GET['pkey_name'])) {
                 $pkeyName = $_GET['pkey_name'];
+                if($pkeyName != validNames[$tableName])
+                    throw new Exception('Wrong primary key name');
                 $sql = $sql . "WHERE $pkeyName LIKE ?;";
             }
             $statement = $dbh->prepare($sql);
@@ -109,6 +113,23 @@ try {
                 header('HTTP/1.1 502 Bad Gateway');
             }
 
+            break;
+        case 'keys':
+            $tableName = $_GET["table_name"];
+            if (!array_key_exists($tableName, validNames))
+                throw new Exception('table name is not valid');
+            $pkeyName = $_GET['pkey_name'];
+            if($pkeyName != validNames[$tableName])
+                throw new Exception('Wrong primary key name');
+            $statement = $dbh->prepare("SELECT $pkeyName FROM $tableName;");
+            if ($statement->execute()) {
+                $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+                $response['status_code_header'] = 'HTTP/1.1 200 OK';
+                $response['body'] = json_encode($result);
+                respond($response);
+            } else {
+                header('HTTP/1.1 502 Bad Gateway');
+            }
             break;
         default:
             header('HTTP/1.1 400 Bad Request');

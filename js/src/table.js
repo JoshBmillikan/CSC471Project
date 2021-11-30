@@ -6,7 +6,7 @@ import {css} from "@emotion/react";
 import styled from 'styled-components'
 import {getData, updateData} from "./data";
 import {InsertModal} from "./InsertModal";
-import {isValid} from "./constraints";
+import {validateInput} from "./constraints";
 
 // Button component to remove a row when clicked
 function DeleteButton(props) {
@@ -179,7 +179,7 @@ export function SQLTable(currentTable) {
 
         const onChange = e => {
             try {
-                isValid(e.target.value, id);
+                validateInput(e.target.value, id);
                 setValue(e.target.value);
             } catch (error) {
                 alert(error.message)

@@ -3,7 +3,7 @@ import Modal from "react-modal";
 /** @jsxImportSource @emotion/react */
 import {css} from "@emotion/react";
 import {getData} from "./data";
-import {isValid} from "./constraints";
+import {validateInput} from "./constraints";
 
 export function InsertModal(props) {
     const [modalOpen, setModalOpen] = useState(false)
@@ -69,7 +69,7 @@ export function InsertModal(props) {
                         const columnData = Array.from(document.forms["insert"].elements).filter((element) => {
                             return element.id !== 'submitButton'
                         }).map((element) => {
-                            isValid(element.value)
+                            validateInput(element.value)
                             return element.value
                         })
                         setModalOpen(false)
@@ -90,7 +90,7 @@ export function InsertModal(props) {
                                     type="text"
                                     onChange={(event)=> {
                                         try {
-                                            isValid(event.target.value,name)
+                                            validateInput(event.target.value,name)
                                         } catch (error) {
                                             alert(error.message)
                                             event.target.value = ''

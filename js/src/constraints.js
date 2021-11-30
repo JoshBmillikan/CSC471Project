@@ -1,11 +1,18 @@
-export function isValid(value, column) {
+export function validateInput(value, column) {
     switch (column) {
-        case 'id':
         case 'weight':
-        case 'num_doses':
-            if (isNaN(value)) throw new Error(`${column}: Input must be a number`);
+            if (isNaN(value))
+                throw new Error(`${column}: Input must be a number`);
             break;
-        case 'middle_initial': if (value.length > 1) throw new Error(`${column}: Input can be at most 1 character`)
+        case 'id':
+        case 'num_doses':
+        case 'patient_id':
+        case 'address_zip':
+            if (value !== parseInt(value))
+                throw new Error(`${column}: Input must be a integer`);
+            break;
+        case 'middle_initial':
+            if (value.length > 1) throw new Error(`${column}: Input can be at most 1 character`)
         default:
             return;
     }
