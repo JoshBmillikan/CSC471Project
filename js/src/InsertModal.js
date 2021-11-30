@@ -2,8 +2,10 @@ import {useState} from "react";
 import Modal from "react-modal";
 /** @jsxImportSource @emotion/react */
 import {css} from "@emotion/react";
-import {getData} from "./data";
+import {getData, getForeignKey, getPKeys, isForeignKey} from "./data";
 import {validateInput} from "./constraints";
+import Select from "react-select";
+import AsyncSelect from "react-select/async";
 
 export function InsertModal(props) {
     const [modalOpen, setModalOpen] = useState(false)
@@ -26,7 +28,7 @@ export function InsertModal(props) {
                     body: JSON.stringify(data),
                 }
             )
-            if(!response.ok)
+            if (!response.ok)
                 alert(await response.text())
         } catch (error) {
             alert(error.message)
@@ -77,6 +79,7 @@ export function InsertModal(props) {
                     }}
                 >
                     {rowNames.map((name) => {
+                        const FKey = getForeignKey(name)
                         return (
                             <div css={css`
                               display: block;
@@ -86,17 +89,23 @@ export function InsertModal(props) {
                                   font-style: italic;
                                 `}
                                 >{name}</label>
-                                <input
-                                    type="text"
-                                    onChange={(event)=> {
-                                        try {
-                                            validateInput(event.target.value,name)
-                                        } catch (error) {
-                                            alert(error.message)
-                                            event.target.value = ''
-                                        }
-                                    }}
-                                />
+                                {
+                                    FKey !== null ? <AsyncSelect
+                                        loadOptions={async () => {
+                                            return getPKeys(FKey[0],FKey[1])
+                                        }}
+                                    />
+                                    : <input
+                                        type="text"
+                                        onChange={(event) => {
+                                            try {
+                                                validateInput(event.target.value, name)
+                                            } catch (error) {
+                                                alert(error.message)
+                                                event.target.value = ''
+                                            }
+                                        }}
+                                    />}
                             </div>
                         )
                     })}

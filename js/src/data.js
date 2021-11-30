@@ -2,17 +2,37 @@
 export async function getData(currentTable, setTableData, setLoading, pkeyName = null, pkeyValue = null) {
     try {
         const response = await fetch(
-            `https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/list/?table_name=
-        ${currentTable.currentTable[0]}
-        ${pkeyName != null ? `&pkey_name=${pkeyName}&pkey_value=${pkeyValue}` : ''} 
+            `https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/list/?table_name=${currentTable.currentTable[0]}${pkeyName != null ? `&pkey_name=${pkeyName}&pkey_value=${pkeyValue}` : ''} 
         `)
         if (response.ok) {
             const data = await response.json()
             setTableData(data)
             setLoading(false)
-        }
-        if(!response.ok)
+        } else
             alert(await response.text())
+    } catch (error) {
+        alert(error.message)
+    }
+}
+
+export function getForeignKey(key) {
+    switch (key) {
+        case 'patient_id':
+            return ['patient', 'id'];
+        default:
+            return null;
+    }
+}
+
+export async function getPKeys(tableName, pkeyName) {
+    try {
+        const response = await fetch(
+            `https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/keys/?table_name=
+        ${tableName}&pkey_name=${pkeyName}
+        `)
+        if (!response.ok)
+            alert(await response.text())
+        return await response.json()
     } catch (error) {
         alert(error.message)
     }
@@ -37,7 +57,7 @@ export async function updateData(rowData, newVal, columnName, currentTable, setT
                 body: JSON.stringify(data),
             }
         )
-        if(!response.ok)
+        if (!response.ok)
             alert(await response.text())
     } catch (error) {
         alert(error.message)
