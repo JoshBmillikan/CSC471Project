@@ -3,45 +3,9 @@ import {useTable} from "react-table";
 import {DotLoader} from "react-spinners";
 /** @jsxImportSource @emotion/react */
 import {css} from "@emotion/react";
-import {createPortal} from "react-dom";
-
-// Fetch the table data from the server
-async function getData(currentTable, setTableData, setLoading) {
-    const response = await fetch(`https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/list/?table_name=${currentTable.currentTable[0]}`)
-    if (response.ok) {
-        const data = await response.json()
-        if (data.length > 0) {
-            setTableData(data)
-            setLoading(false)
-        } else setTableData(null)
-    } else {
-        console.error(response.error())
-    }
-}
-
-// Sends an update request to change a column in a row
-async function updateData(rowData, newVal, columnName, currentTable, setTableData, setLoading) {
-    setLoading(true)
-    const pkey = currentTable.currentTable[1];
-    const data = {
-        table_name: currentTable.currentTable[0],
-        pkey_name: pkey,
-        pkey_value: rowData[pkey],
-        column_name: columnName,
-        column_value: newVal
-    }
-    const response = await fetch(
-        "https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/update",
-        {
-            method: 'post',
-            body: JSON.stringify(data),
-        }
-    )
-    if (!response.ok) {
-        console.error(response.error())
-    }
-    await getData(currentTable, setTableData, setLoading)
-}
+import styled from 'styled-components'
+import {getData, updateData} from "./data";
+import {InsertModal} from "./InsertModal";
 
 // Button component to remove a row when clicked
 function DeleteButton(rowData, currentTable, setTableData, setLoading) {
@@ -61,7 +25,7 @@ function DeleteButton(rowData, currentTable, setTableData, setLoading) {
             }
         )
         if (!response.ok) {
-            console.error(response.error())
+            alert(response.error())
         }
         await getData(currentTable, setTableData, setLoading)
     }
@@ -85,47 +49,49 @@ function DeleteButton(rowData, currentTable, setTableData, setLoading) {
     )
 }
 
-// Window component to enter data for new row
-function InsertWindow(rowNames, callback) {
 
+// I have no idea why, but using InsertModal directly crashes, but this works fine
+function InsertButton(rowNames, currentTable, setTableData, setLoading) {
     return (
-        <div>
-
-        </div>
+        <InsertModal
+            rowNames={rowNames}
+            currentTable={currentTable}
+            setTableData={setTableData}
+            setLoading={setLoading}
+        />
     )
+
 }
 
-// Button component to create a new row
-function InsertButton(rowNames, currentTable, setTableData, setLoading) {
-    const insertFn = async () => {
-        const data = {
-            table_name: currentTable.currentTable[0],
-            pkey_name: currentTable.currentTable[1],
-        }
-        const response = await fetch(
-            "https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/create",
-            {
-                method: 'post',
-                body: JSON.stringify(data),
-            }
-        )
+const TableStyles = styled.div`
+  padding: 1rem;
 
-        await getData(currentTable, setTableData, setLoading)
+  table {
+    border-spacing: 0;
+    border: 1px solid black;
+    background: whitesmoke;
+
+    tr {
+      :last-child {
+        td {
+          border-bottom: 0;
+        }
+      }
     }
 
-    return (
-        <button
-            css={css`
-            `}
-            onClick={() => {
-                createPortal(() => {
-                    return InsertWindow(rowNames, insertFn)
-                }, document.body)
-            }}
-        > + </button>
-    )
+    th,
+    td {
+      margin: 0;
+      padding: 0.5rem;
+      border-bottom: 1px solid black;
+      border-right: 1px solid black;
 
-}
+      :last-child {
+        border-right: 0;
+      }
+    }
+  }
+`
 
 // The table component to display the data from the database
 export function SQLTable(currentTable) {
@@ -190,7 +156,7 @@ export function SQLTable(currentTable) {
         }
 
         const onBlur = () => {
-            updateData(tableData[index],value,id,currentTable,setTableData,setLoading)
+            updateData(tableData[index], value, id, currentTable, setTableData, setLoading)
         }
 
         useEffect(() => {
@@ -225,46 +191,48 @@ export function SQLTable(currentTable) {
     }
 
     return (
-        <table {...getTableProps()}>
-            <thead>
-            {// Loop over the header rows
-                headerGroups.map(headerGroup => (
-                    // Apply the header row props
-                    <tr {...headerGroup.getHeaderGroupProps()}>
-                        {// Loop over the headers in each row
-                            headerGroup.headers.map(column => (
-                                // Apply the header cell props
-                                <th {...column.getHeaderProps()}>
-                                    {// Render the header
-                                        column.render('Header')}
-                                </th>
-                            ))}
-                    </tr>
-                ))}
-            </thead>
-            {/* Apply the table body props */}
-            <tbody {...getTableBodyProps()}>
-            {// Loop over the table rows
-                rows.map(row => {
-                    // Prepare the row for display
-                    prepareRow(row)
-                    return (
-                        // Apply the row props
-                        <tr {...row.getRowProps()}>
-                            {// Loop over the rows cells
-                                row.cells.map(cell => {
-                                    // Apply the cell props
-                                    return (
-                                        <td {...cell.getCellProps()}>
-                                            {// Render the cell contents
-                                                cell.render('Cell')}
-                                        </td>
-                                    )
-                                })}
+        <TableStyles>
+            <table {...getTableProps()}>
+                <thead>
+                {// Loop over the header rows
+                    headerGroups.map(headerGroup => (
+                        // Apply the header row props
+                        <tr {...headerGroup.getHeaderGroupProps()}>
+                            {// Loop over the headers in each row
+                                headerGroup.headers.map(column => (
+                                    // Apply the header cell props
+                                    <th {...column.getHeaderProps()}>
+                                        {// Render the header
+                                            column.render('Header')}
+                                    </th>
+                                ))}
                         </tr>
-                    )
-                })}
-            </tbody>
-        </table>
+                    ))}
+                </thead>
+                {/* Apply the table body props */}
+                <tbody {...getTableBodyProps()}>
+                {// Loop over the table rows
+                    rows.map(row => {
+                        // Prepare the row for display
+                        prepareRow(row)
+                        return (
+                            // Apply the row props
+                            <tr {...row.getRowProps()}>
+                                {// Loop over the rows cells
+                                    row.cells.map(cell => {
+                                        // Apply the cell props
+                                        return (
+                                            <td {...cell.getCellProps()}>
+                                                {// Render the cell contents
+                                                    cell.render('Cell')}
+                                            </td>
+                                        )
+                                    })}
+                            </tr>
+                        )
+                    })}
+                </tbody>
+            </table>
+        </TableStyles>
     )
 }
