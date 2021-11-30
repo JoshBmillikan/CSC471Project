@@ -47,11 +47,11 @@ const validNames = array(
 function readPost()
 {
     $json = json_decode(file_get_contents('php://input'));
-    if(property_exists($json,'table_name')){
-        if(!in_array($json->table_name,validNames))
+    if (property_exists($json, 'table_name')) {
+        if (!in_array($json->table_name, validNames))
             throw new Exception('table name is not valid');
-        if(property_exists($json,'pkey_name')) {
-            if($json->pkey_name != validNames[$json->table_name])
+        if (property_exists($json, 'pkey_name')) {
+            if ($json->pkey_name != validNames[$json->table_name])
                 throw new Exception('Wrong primary key name');
         }
     }
@@ -91,10 +91,16 @@ try {
             break;
         case 'list':
             $tableName = htmlspecialchars($_GET["table_name"]);
-            $statement = $dbh->prepare("
-                SELECT * FROM $tableName;
-            ");
-            if ($statement->execute()) {
+            $sql = "SELECT * FROM $tableName ";
+            if(isset($_GET['pkey_name'])) {
+                $pkeyName = $_GET['pkey_name'];
+                $sql = $sql . "WHERE $pkeyName LIKE ?;";
+            }
+            $statement = $dbh->prepare($sql);
+            if(isset($_GET['pkey_name']))
+            $statementResult = $statement->execute(array($_GET['pkey_value']));
+            else $statementResult = $statement->execute();
+            if ($statementResult) {
                 $result = $statement->fetchAll(PDO::FETCH_ASSOC);
                 $response['status_code_header'] = 'HTTP/1.1 200 OK';
                 $response['body'] = json_encode($result);
