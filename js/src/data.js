@@ -1,16 +1,20 @@
 // Fetch the table data from the server
 export async function getData(currentTable, setTableData, setLoading, pkeyName = null, pkeyValue = null) {
-    const response = await fetch(
-        `https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/list/?table_name=
+    try {
+        const response = await fetch(
+            `https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/list/?table_name=
         ${currentTable.currentTable[0]}
         ${pkeyName != null ? `&pkey_name=${pkeyName}&pkey_value=${pkeyValue}` : ''} 
         `)
-    if (response.ok) {
-        const data = await response.json()
-        setTableData(data)
-        setLoading(false)
-    } else {
-        alert(response.errors)
+        if (response.ok) {
+            const data = await response.json()
+            setTableData(data)
+            setLoading(false)
+        }
+        if(!response.ok)
+            alert(await response.text())
+    } catch (error) {
+        alert(error.message)
     }
 }
 
@@ -25,15 +29,18 @@ export async function updateData(rowData, newVal, columnName, currentTable, setT
         column_name: columnName,
         column_value: newVal
     }
-    const response = await fetch(
-        "https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/update",
-        {
-            method: 'post',
-            body: JSON.stringify(data),
-        }
-    )
-    if (!response.ok) {
-        alert(response.errors)
+    try {
+        const response = await fetch(
+            "https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/update",
+            {
+                method: 'post',
+                body: JSON.stringify(data),
+            }
+        )
+        if(!response.ok)
+            alert(await response.text())
+    } catch (error) {
+        alert(error.message)
     }
     await getData(currentTable, setTableData, setLoading)
 }

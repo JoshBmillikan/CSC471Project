@@ -1,4 +1,4 @@
-import {useEffect, useState, useMemo, useCallback} from "react";
+import {useEffect, useState, useMemo} from "react";
 import {useTable} from "react-table";
 import {DotLoader} from "react-spinners";
 /** @jsxImportSource @emotion/react */
@@ -6,6 +6,7 @@ import {css} from "@emotion/react";
 import styled from 'styled-components'
 import {getData, updateData} from "./data";
 import {InsertModal} from "./InsertModal";
+import {isValid} from "./constraints";
 
 // Button component to remove a row when clicked
 function DeleteButton(props) {
@@ -18,15 +19,18 @@ function DeleteButton(props) {
             pkey_name: pkey,
             pkey_value: rowData[pkey]
         }
-        const response = await fetch(
-            "https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/delete",
-            {
-                method: 'delete',
-                body: JSON.stringify(data),
-            }
-        )
-        if (!response.ok) {
-            alert(response.errors)
+        try {
+            const response = await fetch(
+                "https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/delete",
+                {
+                    method: 'delete',
+                    body: JSON.stringify(data),
+                }
+            )
+            if(!response.ok)
+                alert(await response.text())
+        } catch (error) {
+            alert(error.message)
         }
         await getData(currentTable, setTableData, setLoading)
     }
@@ -172,12 +176,19 @@ export function SQLTable(currentTable) {
                               updateData,
                           }) => {
         const [value, setValue] = useState(initialValue)
+
         const onChange = e => {
-            setValue(e.target.value)
+            try {
+                isValid(e.target.value, id);
+                setValue(e.target.value);
+            } catch (error) {
+                alert(error.message)
+            }
         }
 
         const onBlur = () => {
-            updateData(tableData[index], value, id, currentTable, setTableData, setLoading)
+            if (value !== initialValue)
+                updateData(tableData[index], value, id, currentTable, setTableData, setLoading)
         }
 
         useEffect(() => {

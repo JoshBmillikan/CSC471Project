@@ -1,8 +1,9 @@
-import {useMemo, useState} from "react";
+import {useState} from "react";
 import Modal from "react-modal";
 /** @jsxImportSource @emotion/react */
 import {css} from "@emotion/react";
 import {getData} from "./data";
+import {isValid} from "./constraints";
 
 export function InsertModal(props) {
     const [modalOpen, setModalOpen] = useState(false)
@@ -17,15 +18,18 @@ export function InsertModal(props) {
             pkey_name: currentTable.currentTable[1],
             column_data: columnData
         }
-        const response = await fetch(
-            "https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/create",
-            {
-                method: 'post',
-                body: JSON.stringify(data),
-            }
-        )
-        if (!response.ok) {
-            alert(response.errors)
+        try {
+            const response = await fetch(
+                "https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/create",
+                {
+                    method: 'post',
+                    body: JSON.stringify(data),
+                }
+            )
+            if(!response.ok)
+                alert(await response.text())
+        } catch (error) {
+            alert(error.message)
         }
         await getData(currentTable, setTableData, setLoading)
     }
@@ -65,6 +69,7 @@ export function InsertModal(props) {
                         const columnData = Array.from(document.forms["insert"].elements).filter((element) => {
                             return element.id !== 'submitButton'
                         }).map((element) => {
+                            isValid(element.value)
                             return element.value
                         })
                         setModalOpen(false)
@@ -83,6 +88,14 @@ export function InsertModal(props) {
                                 >{name}</label>
                                 <input
                                     type="text"
+                                    onChange={(event)=> {
+                                        try {
+                                            isValid(event.target.value,name)
+                                        } catch (error) {
+                                            alert(error.message)
+                                            event.target.value = ''
+                                        }
+                                    }}
                                 />
                             </div>
                         )
