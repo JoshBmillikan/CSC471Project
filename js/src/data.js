@@ -10,7 +10,7 @@ export async function getData(currentTable, setTableData, setLoading, pkeyName =
         setTableData(data)
         setLoading(false)
     } else {
-        alert(response.error())
+        alert(response.errors)
     }
 }
 
@@ -33,7 +33,7 @@ export async function updateData(rowData, newVal, columnName, currentTable, setT
         }
     )
     if (!response.ok) {
-        alert(response.error())
+        alert(response.errors)
     }
     await getData(currentTable, setTableData, setLoading)
 }

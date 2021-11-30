@@ -26,7 +26,7 @@ function DeleteButton(props) {
             }
         )
         if (!response.ok) {
-            alert(response.error())
+            alert(response.errors)
         }
         await getData(currentTable, setTableData, setLoading)
     }
@@ -52,7 +52,10 @@ function DeleteButton(props) {
 
 function SearchButton(props) {
     const {currentTable, setTableData, setLoading} = props
-    const [value, setValue] = useState(null)
+    const [value, setValue] = useState('')
+    useEffect(() => {
+        setValue(value)
+    }, [value])
     return (<span>
         <input
             type="text"
@@ -65,7 +68,10 @@ function SearchButton(props) {
         <button
             onClick={() => {
                 setLoading(true)
-                getData(currentTable, setTableData, setLoading, currentTable.currentTable[1], value)
+                if (value === '')
+                    getData(currentTable, setTableData, setLoading)
+                else
+                    getData(currentTable, setTableData, setLoading, currentTable.currentTable[1], value)
             }}
         >
             Search
@@ -212,48 +218,48 @@ export function SQLTable(currentTable) {
                 setLoading={setLoading}
             />
             {tableData.length > 0 ? <TableStyles>
-                <table {...getTableProps()}>
-                    <thead>
-                    {// Loop over the header rows
-                        headerGroups.map(headerGroup => (
-                            // Apply the header row props
-                            <tr {...headerGroup.getHeaderGroupProps()}>
-                                {// Loop over the headers in each row
-                                    headerGroup.headers.map(column => (
-                                        // Apply the header cell props
-                                        <th {...column.getHeaderProps()}>
-                                            {// Render the header
-                                                column.render('Header')}
-                                        </th>
-                                    ))}
-                            </tr>
-                        ))}
-                    </thead>
-                    {/* Apply the table body props */}
-                    <tbody {...getTableBodyProps()}>
-                    {// Loop over the table rows
-                        rows.map(row => {
-                            // Prepare the row for display
-                            prepareRow(row)
-                            return (
-                                // Apply the row props
-                                <tr {...row.getRowProps()}>
-                                    {// Loop over the rows cells
-                                        row.cells.map(cell => {
-                                            // Apply the cell props
-                                            return (
-                                                <td {...cell.getCellProps()}>
-                                                    {// Render the cell contents
-                                                        cell.render('Cell')}
-                                                </td>
-                                            )
-                                        })}
+                    <table {...getTableProps()}>
+                        <thead>
+                        {// Loop over the header rows
+                            headerGroups.map(headerGroup => (
+                                // Apply the header row props
+                                <tr {...headerGroup.getHeaderGroupProps()}>
+                                    {// Loop over the headers in each row
+                                        headerGroup.headers.map(column => (
+                                            // Apply the header cell props
+                                            <th {...column.getHeaderProps()}>
+                                                {// Render the header
+                                                    column.render('Header')}
+                                            </th>
+                                        ))}
                                 </tr>
-                            )
-                        })}
-                    </tbody>
-                </table>
-            </TableStyles>
+                            ))}
+                        </thead>
+                        {/* Apply the table body props */}
+                        <tbody {...getTableBodyProps()}>
+                        {// Loop over the table rows
+                            rows.map(row => {
+                                // Prepare the row for display
+                                prepareRow(row)
+                                return (
+                                    // Apply the row props
+                                    <tr {...row.getRowProps()}>
+                                        {// Loop over the rows cells
+                                            row.cells.map(cell => {
+                                                // Apply the cell props
+                                                return (
+                                                    <td {...cell.getCellProps()}>
+                                                        {// Render the cell contents
+                                                            cell.render('Cell')}
+                                                    </td>
+                                                )
+                                            })}
+                                    </tr>
+                                )
+                            })}
+                        </tbody>
+                    </table>
+                </TableStyles>
                 : <div>No results for current table</div>}
         </div>
     )

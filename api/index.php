@@ -48,7 +48,7 @@ function readPost()
 {
     $json = json_decode(file_get_contents('php://input'));
     if (property_exists($json, 'table_name')) {
-        if (!in_array($json->table_name, validNames))
+        if (!array_key_exists($json->table_name, validNames))
             throw new Exception('table name is not valid');
         if (property_exists($json, 'pkey_name')) {
             if ($json->pkey_name != validNames[$json->table_name])

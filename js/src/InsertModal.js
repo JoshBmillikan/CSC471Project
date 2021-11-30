@@ -25,7 +25,7 @@ export function InsertModal(props) {
             }
         )
         if (!response.ok) {
-            alert(response.error())
+            alert(response.errors)
         }
         await getData(currentTable, setTableData, setLoading)
     }
