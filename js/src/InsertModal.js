@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useMemo, useState} from "react";
 import Modal from "react-modal";
 /** @jsxImportSource @emotion/react */
 import {css} from "@emotion/react";
@@ -7,13 +7,14 @@ import {getData} from "./data";
 export function InsertModal(props) {
     const [modalOpen, setModalOpen] = useState(false)
 
-    const {rowNames, columnData, currentTable, setTableData, setLoading} = props
+    const {rowNames, currentTable, setTableData, setLoading} = props
     Modal.setAppElement('#root');
-    const insertFn = async () => {
+
+    const insertFn = async (columnData) => {
         setLoading(true)
         const data = {
-            table_name: currentTable[0],
-            pkey_name: currentTable[1],
+            table_name: currentTable.currentTable[0],
+            pkey_name: currentTable.currentTable[1],
             column_data: columnData
         }
         const response = await fetch(
@@ -67,7 +68,7 @@ export function InsertModal(props) {
                             return element.value
                         })
                         setModalOpen(false)
-                        insertFn()
+                        insertFn(columnData)
                     }}
                 >
                     {rowNames.map((name) => {

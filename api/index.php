@@ -62,6 +62,7 @@ switch ($uri[3]) {
         break;
     case 'create':
         $post = readPost();
+        var_dump($post);
         $question = str_repeat("?,", count($post->columns) - 1) . '?';
         $statement = $dbh->prepare("
                 INSERT INTO $post->table_name
