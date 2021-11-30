@@ -91,21 +91,22 @@ export function InsertModal(props) {
                                 >{name}</label>
                                 {
                                     FKey !== null ? <AsyncSelect
-                                        loadOptions={async () => {
-                                            return getPKeys(FKey[0],FKey[1])
-                                        }}
-                                    />
-                                    : <input
-                                        type="text"
-                                        onChange={(event) => {
-                                            try {
-                                                validateInput(event.target.value, name)
-                                            } catch (error) {
-                                                alert(error.message)
-                                                event.target.value = ''
-                                            }
-                                        }}
-                                    />}
+                                            cacheOptions
+                                            loadOptions={async () => { //todo, Why isn't this loading...
+                                                return getPKeys(FKey[0], FKey[1])
+                                            }}
+                                        />
+                                        : <input
+                                            type="text"
+                                            onChange={(event) => {
+                                                try {
+                                                    validateInput(event.target.value, name)
+                                                } catch (error) {
+                                                    alert(error.message)
+                                                    event.target.value = ''
+                                                }
+                                            }}
+                                        />}
                             </div>
                         )
                     })}

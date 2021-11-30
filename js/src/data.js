@@ -26,13 +26,14 @@ export function getForeignKey(key) {
 
 export async function getPKeys(tableName, pkeyName) {
     try {
+        alert('AHHH!')
         const response = await fetch(
             `https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/keys/?table_name=
         ${tableName}&pkey_name=${pkeyName}
         `)
         if (!response.ok)
             alert(await response.text())
-        return await response.json()
+        return response.json()
     } catch (error) {
         alert(error.message)
     }
