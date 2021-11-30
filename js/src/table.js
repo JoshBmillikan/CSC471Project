@@ -8,7 +8,8 @@ import {getData, updateData} from "./data";
 import {InsertModal} from "./InsertModal";
 
 // Button component to remove a row when clicked
-function DeleteButton(rowData, currentTable, setTableData, setLoading) {
+function DeleteButton(props) {
+    const {rowData, currentTable, setTableData, setLoading} = props
     const deleteFn = async () => {
         setLoading(true)
         const pkey = currentTable.currentTable[1];
@@ -49,6 +50,29 @@ function DeleteButton(rowData, currentTable, setTableData, setLoading) {
     )
 }
 
+function SearchButton(props) {
+    const {currentTable, setTableData, setLoading} = props
+    const [value, setValue] = useState(null)
+    return (<span>
+        <input
+            type="text"
+            placeholder='primary key'
+            value={value}
+            onChange={(event) => {
+                setValue(event.target.value)
+            }}
+        />
+        <button
+            onClick={() => {
+                setLoading(true)
+                getData(currentTable, setTableData, setLoading, currentTable.currentTable[1], value)
+            }}
+        >
+            Search
+        </button>
+    </span>)
+}
+
 const TableStyles = styled.div`
   padding: 1rem;
 
@@ -84,9 +108,6 @@ export function SQLTable(currentTable) {
     const [tableData, setTableData] = useState(null)
     const [loading, setLoading] = useState(true)
 
-    const pkey = useMemo(() => {
-        return currentTable.currentTable[1]
-    }, [currentTable])
     useEffect(() => {
         setLoading(true)
         if (currentTable != null) {
@@ -96,7 +117,7 @@ export function SQLTable(currentTable) {
 
     const columns = useMemo(
         () => {
-            if (tableData != null) {
+            if (tableData != null && tableData.length > 0) {
                 const cells = Object.getOwnPropertyNames(tableData[0]).map(
                     (it) => {
                         return {
@@ -118,7 +139,10 @@ export function SQLTable(currentTable) {
                         },
                         accessor: 'buttons',
                         Cell: ({row: {index}}) => {
-                            return DeleteButton(tableData[index], currentTable, setTableData, setLoading)
+                            return (<DeleteButton
+                                rowData={tableData[index]} currentTable={currentTable} setTableData={setTableData}
+                                setLoading={setLoading}
+                            />)
                         }
                     }
                 ]
@@ -161,7 +185,6 @@ export function SQLTable(currentTable) {
     const defaultColumn = {
         Cell: EditableCell,
     }
-
     const tableInstance = useTable({columns, data: rowData, defaultColumn, updateData})
 
     const {
@@ -182,48 +205,56 @@ export function SQLTable(currentTable) {
     }
 
     return (
-        <TableStyles>
-            <table {...getTableProps()}>
-                <thead>
-                {// Loop over the header rows
-                    headerGroups.map(headerGroup => (
-                        // Apply the header row props
-                        <tr {...headerGroup.getHeaderGroupProps()}>
-                            {// Loop over the headers in each row
-                                headerGroup.headers.map(column => (
-                                    // Apply the header cell props
-                                    <th {...column.getHeaderProps()}>
-                                        {// Render the header
-                                            column.render('Header')}
-                                    </th>
-                                ))}
-                        </tr>
-                    ))}
-                </thead>
-                {/* Apply the table body props */}
-                <tbody {...getTableBodyProps()}>
-                {// Loop over the table rows
-                    rows.map(row => {
-                        // Prepare the row for display
-                        prepareRow(row)
-                        return (
-                            // Apply the row props
-                            <tr {...row.getRowProps()}>
-                                {// Loop over the rows cells
-                                    row.cells.map(cell => {
-                                        // Apply the cell props
-                                        return (
-                                            <td {...cell.getCellProps()}>
-                                                {// Render the cell contents
-                                                    cell.render('Cell')}
-                                            </td>
-                                        )
-                                    })}
+        <div>
+            <SearchButton
+                currentTable={currentTable}
+                setTableData={setTableData}
+                setLoading={setLoading}
+            />
+            {tableData.length > 0 ? <TableStyles>
+                <table {...getTableProps()}>
+                    <thead>
+                    {// Loop over the header rows
+                        headerGroups.map(headerGroup => (
+                            // Apply the header row props
+                            <tr {...headerGroup.getHeaderGroupProps()}>
+                                {// Loop over the headers in each row
+                                    headerGroup.headers.map(column => (
+                                        // Apply the header cell props
+                                        <th {...column.getHeaderProps()}>
+                                            {// Render the header
+                                                column.render('Header')}
+                                        </th>
+                                    ))}
                             </tr>
-                        )
-                    })}
-                </tbody>
-            </table>
-        </TableStyles>
+                        ))}
+                    </thead>
+                    {/* Apply the table body props */}
+                    <tbody {...getTableBodyProps()}>
+                    {// Loop over the table rows
+                        rows.map(row => {
+                            // Prepare the row for display
+                            prepareRow(row)
+                            return (
+                                // Apply the row props
+                                <tr {...row.getRowProps()}>
+                                    {// Loop over the rows cells
+                                        row.cells.map(cell => {
+                                            // Apply the cell props
+                                            return (
+                                                <td {...cell.getCellProps()}>
+                                                    {// Render the cell contents
+                                                        cell.render('Cell')}
+                                                </td>
+                                            )
+                                        })}
+                                </tr>
+                            )
+                        })}
+                    </tbody>
+                </table>
+            </TableStyles>
+                : <div>No results for current table</div>}
+        </div>
     )
 }

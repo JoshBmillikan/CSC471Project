@@ -2,6 +2,7 @@
 
 namespace api;
 
+use Exception;
 use PDO;
 
 require "./connDB.php";
@@ -35,56 +36,78 @@ function respond($response)
     }
 }
 
+const validNames = array(
+    'patient' => 'id',
+    'vaccine' => 'sci_name',
+    'allergy' => 'patient_id',
+    'takes' => 'patient_id',
+    'vaccination_site' => 'name'
+);
+
 function readPost()
 {
-    $json = file_get_contents('php://input');
-    return json_decode($json);
+    $json = json_decode(file_get_contents('php://input'));
+    if(property_exists($json,'table_name')){
+        if(!in_array($json->table_name,validNames))
+            throw new Exception('table name is not valid');
+        if(property_exists($json,'pkey_name')) {
+            if($json->pkey_name != validNames[$json->table_name])
+                throw new Exception('Wrong primary key name');
+        }
+    }
+    return $json;
 }
 
-switch ($uri[3]) {
-    case 'delete':
-        $post = readPost();
-        $statement = $dbh->prepare("
+try {
+    switch ($uri[3]) {
+        case 'delete':
+            $post = readPost();
+            $statement = $dbh->prepare("
                 DELETE FROM $post->table_name WHERE $post->pkey_name = ?;
             ");
-        $statement->execute(array($post->pkey_value));
-        header('HTTP/1.1 200 OK');
-        break;
-    case 'update':
-        $post = readPost();
-        $statement = $dbh->prepare("
+            $statement->execute(array($post->pkey_value));
+            header('HTTP/1.1 200 OK');
+
+            break;
+        case 'update':
+            $post = readPost();
+            $statement = $dbh->prepare("
                 UPDATE $post->table_name 
                 SET $post->column_name = ? 
                 WHERE $post->pkey_name = ?;
             ");
-        $statement->execute(array($post->column_value, $post->pkey_value));
-        header('HTTP/1.1 200 OK');
-        break;
-    case 'create':
-        $post = readPost();
-        $question = str_repeat("?,", count($post->column_data) - 1) . '?';
-        $statement = $dbh->prepare("
+            $statement->execute(array($post->column_value, $post->pkey_value));
+            header('HTTP/1.1 200 OK');
+            break;
+        case 'create':
+            $post = readPost();
+            $question = str_repeat("?,", count($post->column_data) - 1) . '?';
+            $statement = $dbh->prepare("
                 INSERT INTO $post->table_name
                 VALUES($question);
             ");
-        $statement->execute($post->column_data);
-        header('HTTP/1.1 200 OK');
-        break;
-    case 'list':
-        $tableName = htmlspecialchars($_GET["table_name"]);
-        $statement = $dbh->prepare("
+            $statement->execute($post->column_data);
+            header('HTTP/1.1 200 OK');
+            break;
+        case 'list':
+            $tableName = htmlspecialchars($_GET["table_name"]);
+            $statement = $dbh->prepare("
                 SELECT * FROM $tableName;
             ");
-        if ($statement->execute()) {
-            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-            $response['status_code_header'] = 'HTTP/1.1 200 OK';
-            $response['body'] = json_encode($result);
-            respond($response);
-        } else {
-            header('HTTP/1.1 502 Bad Gateway');
-        }
+            if ($statement->execute()) {
+                $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+                $response['status_code_header'] = 'HTTP/1.1 200 OK';
+                $response['body'] = json_encode($result);
+                respond($response);
+            } else {
+                header('HTTP/1.1 502 Bad Gateway');
+            }
 
-        break;
-    default:
-        header('HTTP/1.1 400 Bad Request');
+            break;
+        default:
+            header('HTTP/1.1 400 Bad Request');
+    }
+} catch (\Exception $e) {
+    header('HTTP/1.1 400 Bad Request');
+    echo $e->getMessage();
 }

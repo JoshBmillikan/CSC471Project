@@ -1,12 +1,14 @@
 // Fetch the table data from the server
-export async function getData(currentTable, setTableData, setLoading) {
-    const response = await fetch(`https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/list/?table_name=${currentTable.currentTable[0]}`)
+export async function getData(currentTable, setTableData, setLoading, pkeyName = null, pkeyValue = null) {
+    const response = await fetch(
+        `https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/list/?table_name=
+        ${currentTable.currentTable[0]}
+        ${pkeyName != null ? `&pkey_name=${pkeyName}&pkey_value=${pkeyValue}` : ''} 
+        `)
     if (response.ok) {
         const data = await response.json()
-        if (data.length > 0) {
-            setTableData(data)
-            setLoading(false)
-        } else setTableData(null)
+        setTableData(data)
+        setLoading(false)
     } else {
         alert(response.error())
     }
