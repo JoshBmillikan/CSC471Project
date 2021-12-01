@@ -1,8 +1,8 @@
-import {useMemo, useState} from "react";
+import {useState} from "react";
 import Modal from "react-modal";
 /** @jsxImportSource @emotion/react */
 import {css} from "@emotion/react";
-import {getData, getForeignKey, IdSelect} from "./data";
+import {getData} from "./data";
 import {validateInput} from "./constraints";
 
 // a modal for inserting a row
