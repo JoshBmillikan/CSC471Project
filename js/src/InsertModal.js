@@ -1,12 +1,11 @@
-import {useState} from "react";
+import {useMemo, useState} from "react";
 import Modal from "react-modal";
 /** @jsxImportSource @emotion/react */
 import {css} from "@emotion/react";
-import {getData, getForeignKey, getPKeys, isForeignKey} from "./data";
+import {getData, getForeignKey, IdSelect} from "./data";
 import {validateInput} from "./constraints";
-import Select from "react-select";
-import AsyncSelect from "react-select/async";
 
+// a modal for inserting a row
 export function InsertModal(props) {
     const [modalOpen, setModalOpen] = useState(false)
 
@@ -35,6 +34,7 @@ export function InsertModal(props) {
         }
         await getData(currentTable, setTableData, setLoading)
     }
+
     return (
         <div>
             <button
@@ -69,7 +69,7 @@ export function InsertModal(props) {
                     onSubmit={(it) => {
                         it.preventDefault()
                         const columnData = Array.from(document.forms["insert"].elements).filter((element) => {
-                            return element.id !== 'submitButton'
+                            return element.id !== 'submitButton' && element.value !== ''
                         }).map((element) => {
                             validateInput(element.value)
                             return element.value
@@ -79,7 +79,7 @@ export function InsertModal(props) {
                     }}
                 >
                     {rowNames.map((name) => {
-                        const FKey = getForeignKey(name)
+                        // create a label and input field for each attribute
                         return (
                             <div css={css`
                               display: block;
@@ -89,25 +89,17 @@ export function InsertModal(props) {
                                   font-style: italic;
                                 `}
                                 >{name}</label>
-                                {
-                                    FKey !== null ? <AsyncSelect
-                                            cacheOptions
-                                            defaultOptions
-                                            loadOptions={() => { //todo, Why isn't this loading...
-                                                return getPKeys(FKey[0], FKey[1])
-                                            }}
-                                        />
-                                        : <input
-                                            type="text"
-                                            onChange={(event) => {
-                                                try {
-                                                    validateInput(event.target.value, name)
-                                                } catch (error) {
-                                                    alert(error.message)
-                                                    event.target.value = ''
-                                                }
-                                            }}
-                                        />}
+                                <input
+                                    type="text"
+                                    onChange={(event) => {
+                                        try {
+                                            validateInput(event.target.value, name)
+                                        } catch (error) {
+                                            alert(error.message)
+                                            event.target.value = ''
+                                        }
+                                    }}
+                                />
                             </div>
                         )
                     })}

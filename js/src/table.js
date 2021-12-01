@@ -54,6 +54,7 @@ function DeleteButton(props) {
     )
 }
 
+// input field and search button functionality
 function SearchButton(props) {
     const {currentTable, setTableData, setLoading} = props
     const [value, setValue] = useState('')
@@ -83,6 +84,7 @@ function SearchButton(props) {
     </span>)
 }
 
+// make the tables look nice
 const TableStyles = styled.div`
   padding: 1rem;
 
@@ -125,6 +127,7 @@ export function SQLTable(currentTable) {
         }
     }, [currentTable])
 
+    // create the table columns from the data retrievied from the server
     const columns = useMemo(
         () => {
             if (tableData != null && tableData.length > 0) {
@@ -137,6 +140,7 @@ export function SQLTable(currentTable) {
                         }
                     }
                 )
+                // the last column is a set of special buttons
                 return [...cells,
                     {
                         Header: () => {
@@ -168,7 +172,7 @@ export function SQLTable(currentTable) {
     )
     const rowData = useMemo(() => tableData != null ? tableData : [{placeholder: "bla"}], [tableData])
 
-    // Create an editable cell
+    // Create editable cells for the table
     const EditableCell = ({
                               value: initialValue,
                               row: {index},
@@ -177,6 +181,7 @@ export function SQLTable(currentTable) {
                           }) => {
         const [value, setValue] = useState(initialValue)
 
+        // update the database if the value was changed
         const onChange = e => {
             try {
                 validateInput(e.target.value, id);
@@ -212,10 +217,9 @@ export function SQLTable(currentTable) {
         prepareRow,
     } = tableInstance
 
-
+    // display a loading icon while waiting for the server's response
     if (loading) {
         return (<DotLoader loading={loading} css={css`
-          border-width: 10px;
           border-color: azure;
           margin-top: 10vh;
         `} color={'#0079fa'}/>)

@@ -1,4 +1,4 @@
-// Fetch the table data from the server
+// Fetch the table data from the server and update the table state
 export async function getData(currentTable, setTableData, setLoading, pkeyName = null, pkeyValue = null) {
     try {
         const response = await fetch(
@@ -10,28 +10,6 @@ export async function getData(currentTable, setTableData, setLoading, pkeyName =
             setLoading(false)
         } else
             alert(await response.text())
-    } catch (error) {
-        alert(error.message)
-    }
-}
-
-export function getForeignKey(key) {
-    switch (key) {
-        case 'patient_id':
-            return ['patient', 'id'];
-        default:
-            return null;
-    }
-}
-
-export async function getPKeys(tableName, pkeyName) {
-    try {
-        const response = await fetch(
-            `https://csc471f21-millikan-joshua.azurewebsites.net/api/index.php/keys/?table_name=${tableName}&pkey_name=${pkeyName}
-        `)
-        if (!response.ok)
-            alert(await response.text())
-        return await response.json()
     } catch (error) {
         alert(error.message)
     }

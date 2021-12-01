@@ -9,8 +9,6 @@ require "./connDB.php";
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-// for testing
-header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: OPTIONS,GET,POST,DELETE,UPDATE");
 header("Access-Control-Max-Age: 3600");
@@ -36,6 +34,7 @@ function respond($response)
     }
 }
 
+// a mapping of all valid table names and primary keys
 const validNames = array(
     'patient' => 'id',
     'vaccine' => 'sci_name',
@@ -44,6 +43,7 @@ const validNames = array(
     'vaccination_site' => 'name'
 );
 
+// reads data from a post request and validates it
 function readPost()
 {
     $json = json_decode(file_get_contents('php://input'));
@@ -60,6 +60,7 @@ function readPost()
 
 try {
     switch ($uri[3]) {
+        // deletes a row from the database
         case 'delete':
             $post = readPost();
             $statement = $dbh->prepare("
@@ -69,6 +70,7 @@ try {
             header('HTTP/1.1 200 OK');
 
             break;
+        //changes a value in the database
         case 'update':
             $post = readPost();
             $statement = $dbh->prepare("
@@ -79,6 +81,7 @@ try {
             $statement->execute(array($post->column_value, $post->pkey_value));
             header('HTTP/1.1 200 OK');
             break;
+        // inserts a new row
         case 'create':
             $post = readPost();
             $question = str_repeat("?,", count($post->column_data) - 1) . '?';
@@ -89,6 +92,7 @@ try {
             $statement->execute($post->column_data);
             header('HTTP/1.1 200 OK');
             break;
+        // responds with a list of all rows in the table
         case 'list':
             $tableName = $_GET["table_name"];
             if (!array_key_exists($tableName, validNames))
@@ -112,8 +116,8 @@ try {
             } else {
                 header('HTTP/1.1 502 Bad Gateway');
             }
-
             break;
+        // gets a list of primary keys for the table
         case 'keys':
             $tableName = $_GET["table_name"];
             if (!array_key_exists($tableName, validNames))
