@@ -64,7 +64,7 @@ function SearchButton(props) {
     return (<span>
         <input
             type="text"
-            placeholder='primary key'
+            placeholder={currentTable[1]}
             value={value}
             onChange={(event) => {
                 setValue(event.target.value)
