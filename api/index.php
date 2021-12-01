@@ -125,7 +125,7 @@ try {
             if ($statement->execute()) {
                 $result = $statement->fetchAll(PDO::FETCH_ASSOC);
                 $response['status_code_header'] = 'HTTP/1.1 200 OK';
-                $response['body'] = json_encode($result);
+                $response['body'] = json_encode(array_values($result));
                 respond($response);
             } else {
                 header('HTTP/1.1 502 Bad Gateway');

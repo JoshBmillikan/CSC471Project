@@ -92,7 +92,8 @@ export function InsertModal(props) {
                                 {
                                     FKey !== null ? <AsyncSelect
                                             cacheOptions
-                                            loadOptions={async () => { //todo, Why isn't this loading...
+                                            defaultOptions
+                                            loadOptions={() => { //todo, Why isn't this loading...
                                                 return getPKeys(FKey[0], FKey[1])
                                             }}
                                         />
